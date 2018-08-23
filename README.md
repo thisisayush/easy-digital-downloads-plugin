@@ -10,6 +10,6 @@
   * Navigate to 'Plugins' -> 'Add New' -> 'Upload Plugin' and upload the zip file. 
 	* Install and Activate the plugin.
   * Navigate to 'Downloads' -> 'Settings' -> 'Payment Gateways' -> 'General'
-  * Select 'Blockonomics' in 'Payment Gateways' section.
+  	* Select 'Blockonomics' in 'Payment Gateways' section.
   * Navigate to 'Downloads' -> 'Settings' -> 'Payment Gateways' -> 'Blockonomics'
   	* And configure blockonomics plugin and put API_KEY
