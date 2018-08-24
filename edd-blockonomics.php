@@ -67,6 +67,7 @@ class EDD_Blockonomics
     add_filter( 'edd_format_amount_decimals',   array( $this, 'btc_decimals' ) );
     add_filter( 'edd_settings_gateways',        array( $this, 'settings' ) );
     add_filter( 'edd_settings_sections_gateways', array( $this, 'register_gateway_section') );
+    add_filter( 'edd_accepted_payment_icons',  array($this, 'pw_edd_payment_icon'));
   }
 
   public function includes() 
@@ -110,12 +111,19 @@ class EDD_Blockonomics
   {
 
     $gateways['blockonomics'] = array(
-      'checkout_label'  => __( 'Bitcoin (by Blockonomics)', 'edd-blockonomics' ),
+      'checkout_label'  => __( 'Bitcoin', 'edd-blockonomics' ),
       'admin_label'     => __( 'Blockonomics', 'edd-blockonomics' ),
       'supports'        => array( 'buy_now' )
     );
 
     return $gateways;
+  }
+
+  function pw_edd_payment_icon($icons) 
+  {
+    $icon_url = plugins_url('img/bitcoin.png', __FILE__);
+    $icons[$icon_url] = 'Bitcoin';
+    return $icons;
   }
 
   public function register_gateway_section( $gateway_sections ) 
@@ -406,7 +414,6 @@ class EDD_Blockonomics
         if($urls_count == '2')
         {
           $message = __("Seems that you have set multiple xPubs or you already have a Callback URL set. <a href='https://blockonomics.freshdesk.com/support/solutions/articles/33000209399-merchants-integrating-multiple-websites' target='_blank'>Here is a guide</a> to setup multiple websites.", 'edd-blockonomics');
-          header("Content-Type: application/text");
           exit($message);
         }
 
@@ -415,13 +422,11 @@ class EDD_Blockonomics
         if($setup_errors)
         {
           $message = __($setup_errors . '</p><p>For more information, please consult <a href="https://blockonomics.freshdesk.com/support/solutions/articles/33000215104-troubleshooting-unable-to-generate-new-address" target="_blank">this troubleshooting article</a></p>', 'edd-blockonomics');
-          header("Content-Type: application/text");
           exit($message);
         }
         else
         {
           $message = __('Congrats ! Setup is all done', 'edd-blockonomics');
-          header("Content-Type: application/text");
           exit($message);
         }
       }
@@ -454,7 +459,6 @@ class EDD_Blockonomics
     if ($address) 
     {
       error_log('Get Order.');
-      header("Content-Type: application/json");
       exit(json_encode($orders[$address]));
     }
 
@@ -568,22 +572,27 @@ class EDD_Blockonomics
 
   public function settings( $settings ) 
   {
+    $listener_url = add_query_arg(array( 'edd-listener' => 'blockonomics', 'action' => 'update_callback') ,home_url());
+    $callback_refresh = __( 'CALLBACK URL', 'edd-blockonomics' ).'<a href="javascript:update_callback()" 
+      id="generate-callback" style="font:400 20px/1 dashicons;margin-left: 7px;position:relative;text-decoration: none;" title="Generate New Callback URL">&#xf463;<a>
+    <script type="text/javascript">
+function update_callback()
+{
+  $.post( "'.$listener_url.'", function( data ) { location.reload(); });
+}
+  </script>
+';
     $blockonomics_settings = array(
       array(
         'id'      => 'edd_blockonomics_api_key',
-        'name'    => __( 'API Key', 'edd-blockonomics' ),
+        'name'    => __( 'BLOCKONOMICS API KEY', 'edd-blockonomics' ),
         'type'    => 'text'
       ),
       array(
         'id'      => 'edd_blockonomics_callback_url',
-        'name'    => __( 'Callback', 'edd-blockonomics' ),
+        'name'    => $callback_refresh,
         'readonly' => true,
         'type'    => 'text'
-      ),
-      array(
-        'id'      => 'edd_blockonomics_updatecallback',
-        'name'    => '',
-        'type'    => 'update_callback',
       ),
       array(
         'id'      => 'edd_blockonomics_accept_altcoins',
@@ -613,21 +622,6 @@ class EDD_Blockonomics
     $settings['blockonomics'] = $blockonomics_settings;
     return $settings;
   }
-}
-
-function edd_update_callback_callback()
-{
-  $listener_url = add_query_arg(array( 'edd-listener' => 'blockonomics', 'action' => 'update_callback') ,home_url());
-  printf('<p>
-    <input type="button" onclick="update_callback()" class="button-primary" value="Update Callback" style="max-width:130px;"/>
-    </p>
-    <script type="text/javascript">
-function update_callback()
-{
-  $.post( "'.$listener_url.'", function( data ) { location.reload(); });
-}
-  </script>
-');
 }
 
 function edd_testsetup_callback() 
