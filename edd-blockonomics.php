@@ -311,7 +311,7 @@ class EDD_Blockonomics
       // No Callback URL set, set one
       if(!$responseObj[0]->callback || $responseObj[0]->callback == null)
       {
-        update_callback_url($callback_url, $responseObj[0]->address, $blockonomics);
+        $this->update_callback_url($callback_url, $responseObj[0]->address, $blockonomics);
         return "1";
       }
       // One xPub with one Callback URL
@@ -326,7 +326,7 @@ class EDD_Blockonomics
         $callback_without_secret =  add_query_arg( 'edd-listener', 'blockonomics', home_url());
         if(strpos($responseObj[0]->callback, $callback_without_secret ) !== false)
         {
-          update_callback_url($callback_url, $responseObj[0]->address, $blockonomics);
+          $this->update_callback_url($callback_url, $responseObj[0]->address, $blockonomics);
           return "1";
         }
 
@@ -484,7 +484,6 @@ class EDD_Blockonomics
     {
       error_log('finish order');
       $order = $orders[$address];
-      echo $order['order_id'];
       error_log(print_r($order, true));
       error_log(edd_get_success_page_uri());
       wp_redirect(edd_get_success_page_uri());
