@@ -37,16 +37,16 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class EDD_Blockonomics 
+class EDD_Blockonomics
 {
-  public function __construct() 
+  public function __construct()
   {
-    if( ! function_exists( 'edd_get_option' ) ) 
+    if( ! function_exists( 'edd_get_option' ) )
     {
       return;
     }
 
-    if( class_exists( 'EDD_License' ) && is_admin() ) 
+    if( class_exists( 'EDD_License' ) && is_admin() )
     {
       $license = new EDD_License( __FILE__, 'Blockonomics Payment Gateway', '1.0.0', 'Blockonomics' );
     }
@@ -60,6 +60,7 @@ class EDD_Blockonomics
     //	add_action( 'template_redirect',            array( $this, 'process_failed_payment' ) );
     //	add_action( 'parse_query',                  array( $this, 'strip_order_arg' ) );
     add_action( 'edd_blockonomics_cc_form',         '__return_false' );
+    add_action( 'admin_notices',        array($this, 'edd_admin_messages') );
 
     add_filter( 'edd_payment_gateways',         array( $this, 'register_gateway' ) );
     add_filter( 'edd_currencies',               array( $this, 'currencies' ) );
@@ -70,15 +71,48 @@ class EDD_Blockonomics
     add_filter( 'edd_accepted_payment_icons',  array($this, 'pw_edd_payment_icon'));
   }
 
-  public function includes() 
+  public function includes()
   {
-    if( ! class_exists( 'Blockonomics' ) ) 
+    if( ! class_exists( 'BlockonomicsAPI' ) )
     {
       require_once( plugin_dir_path( __FILE__ ) . 'php/Blockonomics.php' );
     }
   }
 
-  public function textdomain() 
+  public function edd_admin_messages() {
+    global $edd_options;
+
+    $api_key = trim(edd_get_option('edd_blockonomics_api_key', ''));
+
+    if ( empty($api_key) && $_GET['section'] == 'blockonomics'  && current_user_can( 'manage_shop_settings' ) ) {
+      add_settings_error( 'edd-blockonomics-notices', 'edd_blockonomics_api_invalid', __( 'Please enter your Blockonomics API key and save changes.', 'edd-blockonomics' , 'error' ) );
+    }
+
+    $errors = edd_get_errors();
+    if ( ! $errors ) {
+      $errors = array();
+    }
+
+    if ( array_key_exists('edd_blockonomics_setup_failed', $errors ) && $_GET['section'] == 'blockonomics' 
+      && current_user_can( 'manage_shop_settings' ) )
+    {
+      $error = $errors[ 'edd_blockonomics_setup_failed' ];
+      add_settings_error( 'edd-blockonomics-notices', 'edd_blockonomics_setup_failed', $error , 'error');
+      edd_unset_error('edd_blockonomics_setup_failed');
+    }
+
+    if ( array_key_exists('edd_blockonomics_setup_success', $errors ) && $_GET['section'] == 'blockonomics' 
+      && current_user_can( 'manage_shop_settings' ) )
+    {
+      $error = $errors[ 'edd_blockonomics_setup_success' ];
+      add_settings_error( 'edd-blockonomics-notices', 'edd_blockonomics_setup_success', $error , 'updated');
+      edd_unset_error('edd_blockonomics_setup_success');
+    }
+
+    settings_errors( 'edd-blockonomics-notices' );
+  } 
+
+  public function textdomain()
   {
     // Set filter for plugin's languages directory
     $lang_dir = dirname( plugin_basename( __FILE__ ) ) . '/languages/';
@@ -92,11 +126,11 @@ class EDD_Blockonomics
     $mofile_local  = $lang_dir . $mofile;
     $mofile_global = WP_LANG_DIR . '/edd-blockonomics/' . $mofile;
 
-    if ( file_exists( $mofile_global ) ) 
+    if ( file_exists( $mofile_global ) )
     {
       load_textdomain( 'edd-blockonomics', $mofile_global );
     }
-    elseif( file_exists( $mofile_local ) ) 
+    elseif( file_exists( $mofile_local ) )
     {
       load_textdomain( 'edd-blockonomics', $mofile_local );
     }
@@ -107,7 +141,7 @@ class EDD_Blockonomics
     }
   }
 
-  public function register_gateway( $gateways ) 
+  public function register_gateway( $gateways )
   {
 
     $gateways['blockonomics'] = array(
@@ -119,14 +153,14 @@ class EDD_Blockonomics
     return $gateways;
   }
 
-  function pw_edd_payment_icon($icons) 
+  function pw_edd_payment_icon($icons)
   {
     $icon_url = plugins_url('img/bitcoin.png', __FILE__);
     $icons[$icon_url] = 'Bitcoin';
     return $icons;
   }
 
-  public function register_gateway_section( $gateway_sections ) 
+  public function register_gateway_section( $gateway_sections )
   {
     $gateway_sections['blockonomics'] = __( 'Blockonomics', 'edd-blockonomics' );
     return $gateway_sections;
@@ -135,7 +169,7 @@ class EDD_Blockonomics
   function generate_secret_and_callback($generate_new = false)
   {
     $callback_secret = edd_get_option('edd_blockonomics_callback_secret', '');
-    if ( empty( $callback_secret) || $generate_new ) 
+    if ( empty( $callback_secret) || $generate_new )
     {
       $callback_secret = sha1(openssl_random_pseudo_bytes(20));
       edd_update_option("edd_blockonomics_callback_secret", $callback_secret);
@@ -145,12 +179,12 @@ class EDD_Blockonomics
     edd_update_option('edd_blockonomics_callback_url', $callback_url);
   }
 
-  public function process_payment( $purchase_data ) 
+  public function process_payment( $purchase_data )
   {
     global $edd_options;
 
     $api_key = trim(edd_get_option('edd_blockonomics_api_key', ''));
-    if( empty ($api_key) ) 
+    if( empty ($api_key) )
     {
       edd_set_error( 'edd_blockonomics_api_invalid', __( 'Please enter your Blockonomics API key and secret in Settings', 'edd-blockonomics' ) );
       edd_send_back_to_checkout( '?payment-mode=blockonomics' );
@@ -174,7 +208,7 @@ class EDD_Blockonomics
     $payment_id = edd_insert_payment( $payment_data );
 
     // Check payment
-    if ( ! $payment_id ) 
+    if ( ! $payment_id )
     {
       // Record the error
       edd_record_gateway_error( __( 'Payment Error', 'edd-blockonomics' ), sprintf( __( 'Payment creation failed, Payment data: %s', 'edd-blockonomics' ), json_encode( $payment_data ) ), $payment_id );
@@ -184,14 +218,14 @@ class EDD_Blockonomics
     }
     else
     {
-      try 
+      try
       {
         $callback_secret = trim(edd_get_option('edd_blockonomics_callback_secret', ''));
-        $blockonomics = new Blockonomics;
+        $blockonomics = new BlockonomicsAPI;
         $responseObj = $blockonomics->new_address($api_key, $callback_secret);
         $price = $blockonomics->get_price(edd_get_currency());
 
-        if($responseObj->response_code != 'HTTP/1.1 200 OK') 
+        if($responseObj->response_code != 'HTTP/1.1 200 OK')
         {
           $this->displayError($woocommerce);
           return;
@@ -216,22 +250,22 @@ class EDD_Blockonomics
         //Update post parameters to make them available in the listner method.
         update_post_meta($payment_id, 'blockonomics_address', $address);
         $invoice_url = add_query_arg( array( 'edd-listener' => 'blockonomics', 'show_order' => $address ), home_url() );
-        wp_redirect($invoice_url); 
+        wp_redirect($invoice_url);
         exit;
 
-      } 
-      catch ( Blockonomics_Exception $e ) 
+      }
+      catch ( Blockonomics_Exception $e )
       {
         $error  = json_decode( $e->getResponse() );
 
-        if ( isset( $error->errors ) && is_array( $error->errors ) ) 
+        if ( isset( $error->errors ) && is_array( $error->errors ) )
         {
-          foreach( $error->errors as $error ) 
+          foreach( $error->errors as $error )
           {
             edd_set_error( 'edd_blockonomics_exception', sprintf( __( 'Error: %s', 'edd-blockonomics' ), $error ) );
           }
         }
-        elseif( isset( $error->error ) ) 
+        elseif( isset( $error->error ) )
         {
           edd_set_error( 'edd_blockonomics_exception', $error->error );
         }
@@ -259,7 +293,7 @@ class EDD_Blockonomics
    */
   function check_callback_urls()
   {
-    $blockonomics = new Blockonomics;
+    $blockonomics = new BlockonomicsAPI;
     $responseObj = $blockonomics->get_xpubs(edd_get_option('edd_blockonomics_api_key'));
 
     // No xPubs set
@@ -319,37 +353,37 @@ class EDD_Blockonomics
 
   function testSetup()
   {
-    $blockonomics = new Blockonomics;
-    $responseObj = $blockonomics->new_address(edd_get_option('edd_blockonomics_api_key'), 
+    $blockonomics = new BlockonomicsAPI;
+    $responseObj = $blockonomics->new_address(edd_get_option('edd_blockonomics_api_key'),
       edd_get_option("edd_blockonomics_callback_secret"), true);
 
     error_log(print_r($responseObj, true));
 
-    if(!ini_get('allow_url_fopen')) 
+    if(!ini_get('allow_url_fopen'))
     {
       $error_str = __('<i>allow_url_fopen</i> is not enabled, please enable this in php.ini', 'edd-blockonomics');
 
-    }  
-    elseif( !isset($responseObj->response_code)) 
+    }
+    elseif( !isset($responseObj->response_code))
     {
       $error_str = __('Your webhost is blocking outgoing HTTPS connections. Blockonomics requires an outgoing HTTPS POST (port 443) to generate new address. Check with your webhosting provider to allow this.', 'edd-blockonomics');
-    } 
-    else 
+    }
+    else
     {
-      switch ($responseObj->response_code) 
+      switch ($responseObj->response_code)
       {
       case 'HTTP/1.1 200 OK':
         break;
 
-      case 'HTTP/1.1 401 Unauthorized': 
+      case 'HTTP/1.1 401 Unauthorized':
       {
         $error_str = __('API Key is incorrect. Make sure that the API key set in admin Blockonomics module configuration is correct.', 'edd-blockonomics');
         break;
       }
 
-      case 'HTTP/1.1 500 Internal Server Error': 
+      case 'HTTP/1.1 500 Internal Server Error':
       {
-        if(isset($responseObj->message)) 
+        if(isset($responseObj->message))
         {
           $error_code = $responseObj->message;
 
@@ -364,8 +398,8 @@ class EDD_Blockonomics
             $error_str = $responseObj->message;
           }
           break;
-        } 
-        else 
+        }
+        else
         {
           $error_str = $responseObj->response_code;
           break;
@@ -378,7 +412,7 @@ class EDD_Blockonomics
       }
     }
 
-    if(isset($error_str)) 
+    if(isset($error_str))
     {
       return $error_str;
     }
@@ -387,14 +421,14 @@ class EDD_Blockonomics
     return false;
   }
 
-  public function listener() 
+  public function listener()
   {
-    if( empty( $_GET['edd-listener'] ) ) 
+    if( empty( $_GET['edd-listener'] ) )
     {
       return;
     }
 
-    if( 'blockonomics' != $_GET['edd-listener'] ) 
+    if( 'blockonomics' != $_GET['edd-listener'] )
     {
       return;
     }
@@ -409,12 +443,15 @@ class EDD_Blockonomics
       }
       else if ($action == "test_setup")
       {
+        error_log('Inside test setup.');
         $urls_count = $this->check_callback_urls();
-
+        
+        error_log( print_r($urls_count, true) );
         if($urls_count == '2')
         {
           $message = __("Seems that you have set multiple xPubs or you already have a Callback URL set. <a href='https://blockonomics.freshdesk.com/support/solutions/articles/33000209399-merchants-integrating-multiple-websites' target='_blank'>Here is a guide</a> to setup multiple websites.", 'edd-blockonomics');
-          exit($message);
+          edd_set_error('edd_blockonomics_setup_failed', $message );
+          exit;
         }
 
         $setup_errors = $this->testSetup();
@@ -422,26 +459,28 @@ class EDD_Blockonomics
         if($setup_errors)
         {
           $message = __($setup_errors . '</p><p>For more information, please consult <a href="https://blockonomics.freshdesk.com/support/solutions/articles/33000215104-troubleshooting-unable-to-generate-new-address" target="_blank">this troubleshooting article</a></p>', 'edd-blockonomics');
-          exit($message);
+          edd_set_error('edd_blockonomics_setup_failed', $message );
+          exit;
         }
         else
         {
           $message = __('Congrats ! Setup is all done', 'edd-blockonomics');
-          exit($message);
+          edd_set_error('edd_blockonomics_setup_success', $message );
+          exit;
         }
       }
     }
 
     $orders = edd_get_option('edd_blockonomics_orders');
     $address = isset($_REQUEST["show_order"]) ? $_REQUEST["show_order"] : "";
-    if ($address) 
+    if ($address)
     {
       include plugin_dir_path(__FILE__)."order.php";
       exit();
     }
 
     $address = isset($_REQUEST["finish_order"]) ? $_REQUEST["finish_order"] : "";
-    if ($address) 
+    if ($address)
     {
       error_log('finish order');
       $order = $orders[$address];
@@ -449,20 +488,21 @@ class EDD_Blockonomics
       error_log(print_r($order, true));
       error_log(edd_get_success_page_uri());
       wp_redirect(edd_get_success_page_uri());
-      exit();
+      exit;
     }
 
     $address = isset($_REQUEST['get_order']) ? $_REQUEST['get_order'] : "";
     error_log('Inside listener() method.');
     error_log(print_r($address, true));
 
-    if ($address) 
+    if ($address)
     {
       error_log('Get Order.');
+      header("Content-Type: application/json");
       exit(json_encode($orders[$address]));
     }
 
-    try 
+    try
     {
       $callback_secret = edd_get_option("edd_blockonomics_callback_secret");
       $secret = isset($_REQUEST['secret']) ? $_REQUEST['secret'] : "";
@@ -470,7 +510,7 @@ class EDD_Blockonomics
       error_log(print_r($secret, true));
       error_log(print_r($callback_secret, true));
 
-      if ($callback_secret  && $callback_secret == $secret) 
+      if ($callback_secret  && $callback_secret == $secret)
       {
         $addr = $_REQUEST['addr'];
         $order = $orders[$addr];
@@ -479,22 +519,22 @@ class EDD_Blockonomics
         error_log(print_r($order_id, true));
         error_log(print_r($order, true));
 
-        if ($order_id) 
+        if ($order_id)
         {
           $status = intval($_REQUEST['status']);
           $existing_status = $order['status'];
           $timestamp = $order['timestamp'];
           $time_period = edd_get_option("edd_blockonomics_timeperiod", 10) *60;
 
-          if ($status == 0 && time() > $timestamp + $time_period) 
+          if ($status == 0 && time() > $timestamp + $time_period)
           {
             $minutes = (time() - $timestamp)/60;
             edd_record_gateway_error(__("Warning: Payment arrived after $minutes minutes. Received BTC may not match current bitcoin price", 'edd-blockonomics'));
           }
-          elseif ($status == 2) 
+          elseif ($status == 2)
           {
             update_post_meta($order_id, 'paid_btc_amount', $_REQUEST['value']/1.0e8);
-            if ($order['satoshi'] > $_REQUEST['value']) 
+            if ($order['satoshi'] > $_REQUEST['value'])
             {
               $status = -2; //Payment error , amount not matching
               edd_record_gateway_error(__('Paid BTC amount less than expected.','edd-blockonomics'));
@@ -502,13 +542,13 @@ class EDD_Blockonomics
             }
             else
             {
-              if ($order['satoshi'] < $_REQUEST['value']) 
+              if ($order['satoshi'] < $_REQUEST['value'])
               {
                 edd_insert_payment_note(__('Overpayment of BTC amount', 'edd-blockonomics'));
               }
 
               edd_insert_payment_note(__('Payment completed', 'edd-blockonomics'));
-              edd_set_payment_transaction_id( $payment_id, $order['txid']);
+              edd_set_payment_transaction_id( $order_id, $_REQUEST['txid']);
               edd_update_payment_status($order_id, 'publish' );
             }
           }
@@ -519,27 +559,27 @@ class EDD_Blockonomics
           error_log('tx id.');
           error_log(print_r($order['txid'] , true));
 
-          if ($existing_status == -1) 
+          if ($existing_status == -1)
           {
             update_post_meta($order_id, 'blockonomics_txid', $order['txid']);
             update_post_meta($order_id, 'expected_btc_amount', $order['satoshi']/1.0e8);
           }
 
-          edd_update_option('blockonomics_orders', $orders);
+          edd_update_option('edd_blockonomics_orders', $orders);
         }
       }
-    } 
-    catch ( Blockonomics_Exception $e ) 
+    }
+    catch ( Blockonomics_Exception $e )
     {
       $error = json_decode( $e->getResponse() );
 
-      if( isset( $error->errors ) ) 
+      if( isset( $error->errors ) )
       {
-        foreach( $error->errors as $error ) 
+        foreach( $error->errors as $error )
         {
           edd_record_gateway_error( __( 'Blockonomics Error', 'edd-blockonomics' ), 'Message: ' . $error );
         }
-      } elseif( isset( $error->error ) ) 
+      } elseif( isset( $error->error ) )
       {
         edd_record_gateway_error( __( 'Blockonomics Error', 'edd-blockonomics' ), 'Message: ' . $error->error );
       }
@@ -548,18 +588,18 @@ class EDD_Blockonomics
     }
   }
 
-  public function currencies( $currencies ) 
+  public function currencies( $currencies )
   {
     $currencies['BTC'] = __( 'Bitcoin', 'edd-blockonomics' );
     return $currencies;
   }
 
-  function btc_decimals( $decimals = 2 ) 
+  function btc_decimals( $decimals = 2 )
   {
     global $edd_options;
     $currency = edd_get_currency();
 
-    switch ( $currency ) 
+    switch ( $currency )
     {
     case 'BTC' :
       $decimals = 8;
@@ -570,10 +610,10 @@ class EDD_Blockonomics
   }
 
 
-  public function settings( $settings ) 
+  public function settings( $settings )
   {
     $listener_url = add_query_arg(array( 'edd-listener' => 'blockonomics', 'action' => 'update_callback') ,home_url());
-    $callback_refresh = __( 'CALLBACK URL', 'edd-blockonomics' ).'<a href="javascript:update_callback()" 
+    $callback_refresh = __( 'CALLBACK URL', 'edd-blockonomics' ).'<a href="javascript:update_callback()"
       id="generate-callback" style="font:400 20px/1 dashicons;margin-left: 7px;position:relative;text-decoration: none;" title="Generate New Callback URL">&#xf463;<a>
     <script type="text/javascript">
 function update_callback()
@@ -582,6 +622,24 @@ function update_callback()
 }
   </script>
 ';
+    $api_key = trim(edd_get_option('edd_blockonomics_api_key', ''));
+    $setup_listener_url = add_query_arg(array( 'edd-listener' => 'blockonomics', 'action' => 'test_setup') ,home_url());
+    $disabled = '';
+    if ( empty($api_key) )
+    {
+      $disabled = 'disabled';
+    }
+
+    $test_setup = '<p>
+    <input type="button" '.$disabled.' onclick="test_setup()" class="button-primary" name="test-setup-submit" value="Test Setup" style="max-width:90px;">
+    </p>
+<script type="text/javascript">
+function test_setup()
+{
+  $.post( "'.$setup_listener_url.'", function(data){location.reload();});
+}
+</script>';
+
     $blockonomics_settings = array(
       array(
         'id'      => 'edd_blockonomics_api_key',
@@ -613,7 +671,8 @@ function update_callback()
       ),
       array(
         'id'      => 'edd_blockonomics_testsetup',
-        'name'    => '',
+        'name'    => $test_setup,
+        'readonly' => true,
         'type'    => 'testsetup',
       )
     );
@@ -624,38 +683,13 @@ function update_callback()
   }
 }
 
-function edd_testsetup_callback() 
+function edd_testsetup_callback()
 {
-  $listener_url = add_query_arg(array( 'edd-listener' => 'blockonomics', 'action' => 'test_setup') ,home_url());
-
-  printf('<p>
-    <input type="button" onclick="test_setup()" class="button-primary" name="test-setup-submit" value="Test Setup" style="max-width:90px;">
-    </p>
-    <div id="dialog" title="Testing setup.">
-      <p id="dialog-text"></p>
-    </div>
-<script type="text/javascript">
-
-$(function() {
-  $("#dialog").dialog({
-    autoOpen : false
-  });
-});
-
-function test_setup()
-{
-  $.post( "'.$listener_url.'", function( data ) 
-  { 
-    $("#dialog-text").html(data); 
-    $("#dialog").dialog("open");
-  });
-}
-</script>
-');
+  printf();
 }
 
 
-function edd_blockonomics_init() 
+function edd_blockonomics_init()
 {
   $edd_blockonomics = new EDD_Blockonomics;
 }

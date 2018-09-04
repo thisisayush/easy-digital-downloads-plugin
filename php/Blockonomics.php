@@ -1,6 +1,6 @@
 <?php
 
-class Blockonomics
+class BlockonomicsAPI
 {
     const BASE_URL = 'https://www.blockonomics.co';
     const NEW_ADDRESS_URL = 'https://www.blockonomics.co/api/new_address';
@@ -34,7 +34,7 @@ class Blockonomics
         }
         
         $context = stream_context_create($options);
-        $contents = file_get_contents(Blockonomics::NEW_ADDRESS_URL.$get_params, false, $context);
+        $contents = file_get_contents(BlockonomicsAPI::NEW_ADDRESS_URL.$get_params, false, $context);
         $responseObj = json_decode($contents);
 
         //Create response object if it does not exist
@@ -48,7 +48,7 @@ class Blockonomics
     {
         $options = array( 'http' => array( 'method'  => 'GET') );
         $context = stream_context_create($options);
-        $contents = file_get_contents(Blockonomics::PRICE_URL. "?currency=$currency", false, $context);
+        $contents = file_get_contents(BlockonomicsAPI::PRICE_URL. "?currency=$currency", false, $context);
         $price = json_decode($contents);
         return $price->price;
     }
@@ -65,7 +65,7 @@ class Blockonomics
         );
 
         $context = stream_context_create($options);
-        $contents = file_get_contents(Blockonomics::ADDRESS_URL, false, $context);
+        $contents = file_get_contents(BlockonomicsAPI::ADDRESS_URL, false, $context);
         $responseObj = json_decode($contents);
 
         return $responseObj;
@@ -83,7 +83,7 @@ class Blockonomics
         );
 
         $context = stream_context_create($options);
-        $contents = file_get_contents(Blockonomics::SET_CALLBACK_URL, false, $context);
+        $contents = file_get_contents(BlockonomicsAPI::SET_CALLBACK_URL, false, $context);
         $responseObj = json_decode($contents);
 
         return $responseObj;
