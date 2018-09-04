@@ -536,17 +536,17 @@ class EDD_Blockonomics
             if ($order['satoshi'] > $_REQUEST['value'])
             {
               $status = -2; //Payment error , amount not matching
-              edd_record_gateway_error(__('Paid BTC amount less than expected.','edd-blockonomics'));
+              edd_insert_payment_note($order_id, __('Paid BTC amount less than expected.','edd-blockonomics'));
               edd_update_payment_status($order_id, 'failed');
             }
             else
             {
               if ($order['satoshi'] < $_REQUEST['value'])
               {
-                edd_insert_payment_note(__('Overpayment of BTC amount', 'edd-blockonomics'));
+                edd_insert_payment_note($order_id, __('Overpayment of BTC amount', 'edd-blockonomics'));
               }
 
-              edd_insert_payment_note(__('Payment completed', 'edd-blockonomics'));
+              edd_insert_payment_note($order_id, __('Payment completed', 'edd-blockonomics'));
               edd_set_payment_transaction_id( $order_id, $_REQUEST['txid']);
               edd_update_payment_status($order_id, 'publish' );
             }
@@ -613,7 +613,7 @@ class EDD_Blockonomics
   {
     $listener_url = add_query_arg(array( 'edd-listener' => 'blockonomics', 'action' => 'update_callback') ,home_url());
     $callback_refresh = __( 'CALLBACK URL', 'edd-blockonomics' ).'<a href="javascript:update_callback()"
-      id="generate-callback" style="font:400 20px/1 dashicons;margin-left: 7px;position:relative;text-decoration: none;" title="Generate New Callback URL">&#xf463;<a>
+      id="generate-callback" style="font:400 20px/1 dashicons;margin-left: 7px; top: 4px;position:relative;text-decoration: none;" title="Generate New Callback URL">&#xf463;<a>
     <script type="text/javascript">
 function update_callback()
 {
