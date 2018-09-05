@@ -69,6 +69,7 @@ class EDD_Blockonomics
     add_filter( 'edd_settings_gateways',        array( $this, 'settings' ) );
     add_filter( 'edd_settings_sections_gateways', array( $this, 'register_gateway_section') );
     add_filter( 'edd_accepted_payment_icons',  array($this, 'pw_edd_payment_icon'));
+    add_filter( 'edd_view_order_details_payment_meta_after', array( $this, 'action_edd_view_order_details_payment_meta_after'), 10, 1 );
   }
 
   public function includes()
@@ -79,6 +80,59 @@ class EDD_Blockonomics
     }
   }
 
+  public function action_edd_view_order_details_payment_meta_after( $payment_id ) 
+  {
+    $payment = new EDD_Payment( $payment_id );
+    $meta_data = $payment->get_meta();
+    if ( !empty($meta_data['blockonomics_txid']) )
+    {
+?>
+    <div class="edd-order-tx-id edd-admin-box-inside">
+      <p>
+        <span class="label"><?php _e( 'Bitcoin Transaction ID:', 'edd_blockonomics' ); ?></span>&nbsp;
+        <span><?php echo $meta_data['blockonomics_txid']; ?></span>
+      </p>
+    </div>
+<?php
+    }
+
+    if ( !empty($meta_data['bitcoin_address']) )
+    {
+?>
+    <div class="edd-order-tx-id edd-admin-box-inside">
+      <p>
+        <span class="label"><?php _e( 'Bitcoin Address:', 'edd_blockonomics' ); ?></span>&nbsp;
+        <span><?php echo $meta_data['bitcoin_address']; ?></span>
+      </p>
+    </div>
+<?php
+    }
+
+    if ( !empty($meta_data['expected_btc_amount']) )
+    {
+?>
+    <div class="edd-order-tx-id edd-admin-box-inside">
+      <p>
+        <span class="label"><?php _e( 'Expected BTC Amount:', 'edd_blockonomics' ); ?></span>&nbsp;
+        <span><?php echo $meta_data['expected_btc_amount']; ?></span>
+      </p>
+    </div>
+<?php
+    }
+
+    if ( !empty($meta_data['paid_btc_amount']) )
+    {
+?>
+    <div class="edd-order-tx-id edd-admin-box-inside">
+      <p>
+        <span class="label"><?php _e( 'Actual BTC Amount:', 'edd_blockonomics' ); ?></span>&nbsp;
+        <span><?php echo $meta_data['paid_btc_amount']; ?></span>
+      </p>
+    </div>
+<?php
+    }
+  }
+  
   public function edd_admin_messages() {
     global $edd_options;
 
@@ -532,7 +586,11 @@ class EDD_Blockonomics
           }
           elseif ($status == 2)
           {
-            update_post_meta($order_id, 'paid_btc_amount', $_REQUEST['value']/1.0e8);
+            $payment = new EDD_Payment( $order_id );
+            $meta_data = $payment->get_meta();
+            $meta_data['paid_btc_amount'] = $_REQUEST['value']/1.0e8;
+            $payment->update_meta( '_edd_payment_meta', $meta_data ); 
+			
             if ($order['satoshi'] > $_REQUEST['value'])
             {
               $status = -2; //Payment error , amount not matching
@@ -547,7 +605,6 @@ class EDD_Blockonomics
               }
 
               edd_insert_payment_note($order_id, __('Payment completed', 'edd-blockonomics'));
-              edd_set_payment_transaction_id( $order_id, $_REQUEST['txid']);
               edd_update_payment_status($order_id, 'publish' );
             }
           }
@@ -557,13 +614,17 @@ class EDD_Blockonomics
           $orders[$addr] = $order;
           error_log('tx id.');
           error_log(print_r($order['txid'] , true));
-
+		  
           if ($existing_status == -1)
           {
-            update_post_meta($order_id, 'blockonomics_txid', $order['txid']);
-            update_post_meta($order_id, 'expected_btc_amount', $order['satoshi']/1.0e8);
+            $payment = new EDD_Payment( $order_id );
+            $meta_data = $payment->get_meta();
+            $meta_data['blockonomics_txid'] = $order['txid'];
+            $meta_data['expected_btc_amount'] = $order['satoshi']/1.0e8;
+            $meta_data['bitcoin_address'] =  $addr;
+            $payment->update_meta( '_edd_payment_meta', $meta_data ); 
           }
-
+		  
           edd_update_option('edd_blockonomics_orders', $orders);
         }
       }
