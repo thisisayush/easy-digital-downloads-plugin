@@ -89,7 +89,7 @@ class EDD_Blockonomics
 ?>
     <div class="edd-order-tx-id edd-admin-box-inside">
       <p>
-        <span class="label"><?php _e( 'Bitcoin Transaction ID:', 'edd_blockonomics' ); ?></span>&nbsp;
+        <span class="label"><?php _e( 'Bitcoin Transaction ID:', 'edd-blockonomics' ); ?></span>&nbsp;
         <span><?php echo $meta_data['blockonomics_txid']; ?></span>
       </p>
     </div>
@@ -101,7 +101,7 @@ class EDD_Blockonomics
 ?>
     <div class="edd-order-tx-id edd-admin-box-inside">
       <p>
-        <span class="label"><?php _e( 'Bitcoin Address:', 'edd_blockonomics' ); ?></span>&nbsp;
+        <span class="label"><?php _e( 'Bitcoin Address:', 'edd-blockonomics' ); ?></span>&nbsp;
         <span><?php echo $meta_data['bitcoin_address']; ?></span>
       </p>
     </div>
@@ -113,7 +113,7 @@ class EDD_Blockonomics
 ?>
     <div class="edd-order-tx-id edd-admin-box-inside">
       <p>
-        <span class="label"><?php _e( 'Expected BTC Amount:', 'edd_blockonomics' ); ?></span>&nbsp;
+        <span class="label"><?php _e( 'Expected BTC Amount:', 'edd-blockonomics' ); ?></span>&nbsp;
         <span><?php echo $meta_data['expected_btc_amount']; ?></span>
       </p>
     </div>
@@ -125,7 +125,7 @@ class EDD_Blockonomics
 ?>
     <div class="edd-order-tx-id edd-admin-box-inside">
       <p>
-        <span class="label"><?php _e( 'Actual BTC Amount:', 'edd_blockonomics' ); ?></span>&nbsp;
+        <span class="label"><?php _e( 'Actual BTC Amount:', 'edd-blockonomics' ); ?></span>&nbsp;
         <span><?php echo $meta_data['paid_btc_amount']; ?></span>
       </p>
     </div>
@@ -281,7 +281,7 @@ class EDD_Blockonomics
 
         if($responseObj->response_code != 'HTTP/1.1 200 OK')
         {
-          $this->displayError($woocommerce);
+          edd_record_gateway_error( __( 'Error while getting BTC price', 'edd-blockonomics' ) );
           return;
         }
 
@@ -690,7 +690,7 @@ function update_callback()
       $disabled = 'disabled';
     }
 
-    $test_setup = '<p>
+    $test_setup = '<p><b><i>'.__('Use below button to test the configuration.', 'edd-blockonomics').'</i></b></p><p>
     <input type="button" '.$disabled.' onclick="test_setup()" class="button-primary" name="test-setup-submit" value="Test Setup" style="max-width:90px;">
     </p>
 <script type="text/javascript">
@@ -745,7 +745,7 @@ function test_setup()
 
 function edd_testsetup_callback()
 {
-  printf();
+  printf("");
 }
 
 
