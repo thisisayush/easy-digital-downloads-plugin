@@ -490,9 +490,11 @@ class EDD_Blockonomics
     $action = isset($_REQUEST["action"]) ? $_REQUEST["action"] : "";
     if( !empty($action) )
     {
+      $settings_page = admin_url( 'edit.php?post_type=download&page=edd-settings&tab=gateways&section=blockonomics');
       if($action == "update_callback")
       {
         $this->generate_secret_and_callback(true);
+        wp_redirect($settings_page);
         exit;
       }
       else if ($action == "test_setup")
@@ -505,6 +507,7 @@ class EDD_Blockonomics
         {
           $message = __("Seems that you have set multiple xPubs or you already have a Callback URL set. <a href='https://blockonomics.freshdesk.com/support/solutions/articles/33000209399-merchants-integrating-multiple-websites' target='_blank'>Here is a guide</a> to setup multiple websites.", 'edd-blockonomics');
           edd_set_error('edd_blockonomics_setup_failed', $message );
+          wp_redirect($settings_page);
           exit;
         }
 
@@ -514,12 +517,14 @@ class EDD_Blockonomics
         {
           $message = __($setup_errors . '</p><p>For more information, please consult <a href="https://blockonomics.freshdesk.com/support/solutions/articles/33000215104-troubleshooting-unable-to-generate-new-address" target="_blank">this troubleshooting article</a></p>', 'edd-blockonomics');
           edd_set_error('edd_blockonomics_setup_failed', $message );
+          wp_redirect($settings_page);
           exit;
         }
         else
         {
           $message = __('Congrats ! Setup is all done', 'edd-blockonomics');
           edd_set_error('edd_blockonomics_setup_success', $message );
+          wp_redirect($settings_page);
           exit;
         }
       }
@@ -672,33 +677,21 @@ class EDD_Blockonomics
 
   public function settings( $settings )
   {
-    $listener_url = add_query_arg(array( 'edd-listener' => 'blockonomics', 'action' => 'update_callback') ,home_url());
-    $callback_refresh = __( 'CALLBACK URL', 'edd-blockonomics' ).'<a href="javascript:update_callback()"
-      id="generate-callback" style="font:400 20px/1 dashicons;margin-left: 7px; top: 4px;position:relative;text-decoration: none;" title="Generate New Callback URL">&#xf463;<a>
-    <script type="text/javascript">
-function update_callback()
-{
-  $.post( "'.$listener_url.'", function( data ) { location.reload(); });
-}
-  </script>
-';
-    $api_key = trim(edd_get_option('edd_blockonomics_api_key', ''));
+    $callback_update_url = add_query_arg(array( 'edd-listener' => 'blockonomics', 'action' => 'update_callback') ,home_url());
+    $callback_refresh = __( 'CALLBACK URL', 'edd-blockonomics' ).'<a href="'.$callback_update_url.'"
+      id="generate-callback" style="font:400 20px/1 dashicons;margin-left: 7px; top: 4px;position:relative;text-decoration: none;" title="Generate New Callback URL">&#xf463;<a>';
+
     $setup_listener_url = add_query_arg(array( 'edd-listener' => 'blockonomics', 'action' => 'test_setup') ,home_url());
+
+    $api_key = trim(edd_get_option('edd_blockonomics_api_key', ''));
     $disabled = '';
     if ( empty($api_key) )
     {
       $disabled = 'disabled';
     }
 
-    $test_setup = '<p><b><i>'.__('Use below button to test the configuration.', 'edd-blockonomics').'</i></b></p><p>
-    <input type="button" '.$disabled.' onclick="test_setup()" class="button-primary" name="test-setup-submit" value="Test Setup" style="max-width:90px;">
-    </p>
-<script type="text/javascript">
-function test_setup()
-{
-  $.post( "'.$setup_listener_url.'", function(data){location.reload();});
-}
-</script>';
+    $test_setup = '<p><b><i>'.__('Use below button to test the configuration.', 'edd-blockonomics').'</i></b></p>
+	<p> <a href="'.$setup_listener_url.'" '.$disabled.' class="button-primary" style="max-width:90px;">Test Setup</a> </p>';
 
     $blockonomics_settings = array(
       array(
