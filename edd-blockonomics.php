@@ -688,10 +688,20 @@ class EDD_Blockonomics
     if ( empty($api_key) )
     {
       $disabled = 'disabled';
+      $setup_listener_url = '#';
     }
 
     $test_setup = '<p><b><i>'.__('Use below button to test the configuration.', 'edd-blockonomics').'</i></b></p>
-	<p> <a href="'.$setup_listener_url.'" '.$disabled.' class="button-primary" style="max-width:90px;">Test Setup</a> </p>';
+      <p> <a id="edd-blockonomics-test-setup"  href="'.$setup_listener_url.'" '.$disabled.' class="button button-small" style="max-width:90px;">Test Setup</a> </p>
+
+  <script type="text/javascript">
+$("input[name=\'edd_settings[edd_blockonomics_api_key]\']").change(function() {
+  $( "#edd-blockonomics-test-setup" ).attr("disabled", "disabled");
+  $( "#edd-blockonomics-test-setup" ).attr("href", "#");
+});
+
+</script>
+';
 
     $blockonomics_settings = array(
       array(
