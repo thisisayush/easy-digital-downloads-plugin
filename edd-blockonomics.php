@@ -696,8 +696,43 @@ class EDD_Blockonomics
 
   <script type="text/javascript">
 $("input[name=\'edd_settings[edd_blockonomics_api_key]\']").change(function() {
-  $( "#edd-blockonomics-test-setup" ).attr("disabled", "disabled");
-  $( "#edd-blockonomics-test-setup" ).attr("href", "#");
+
+if($("#setting-error-edd_blockonomics_api_key_changed").length == 0) {
+    /* create notice div */
+    var div = document.createElement( "div" );
+    div.classList.add( "error", "settings-warning", "notice", "is-dismissible" );
+    div.setAttribute( "id", "setting-error-edd_blockonomics_api_key_changed" );
+     
+    /* create paragraph element to hold message */
+    var p = document.createElement( "p" );
+     
+    /* Add message text */
+    p.appendChild( document.createTextNode( "API Key has changed. Click on Save Changes first." ) );
+    div.appendChild( p );
+ 
+    /* Create Dismiss icon */
+    var b = document.createElement( "button" );
+    b.setAttribute( "type", "button" );
+    b.classList.add( "notice-dismiss" );
+ 
+    /* Add screen reader text to Dismiss icon */
+    var bSpan = document.createElement( "span" );
+    bSpan.classList.add( "screen-reader-text" );
+    bSpan.appendChild( document.createTextNode( "Dismiss this notice." ) );
+    b.appendChild( bSpan );
+ 
+    /* Add Dismiss icon to notice */
+    div.appendChild( b );
+ 
+    /* Insert notice after the first h2 */
+    var h2 = document.getElementsByTagName( "h2" )[0];
+    h2.parentNode.insertBefore( div, h2.nextSibling);
+ 
+    /* Make the notice dismissable when the Dismiss icon is clicked */
+    b.addEventListener( "click", function () {
+        div.parentNode.removeChild( div );
+    });
+}
 });
 
 </script>
@@ -714,11 +749,6 @@ $("input[name=\'edd_settings[edd_blockonomics_api_key]\']").change(function() {
         'name'    => $callback_refresh,
         'readonly' => true,
         'type'    => 'text'
-      ),
-      array(
-        'id'      => 'edd_blockonomics_accept_altcoins',
-        'name'    => __('Accept Altcoin Payments (Using Shapeshift)', 'edd-blockonomics'),
-        'type'    => 'checkbox'
       ),
       array(
         'id'      => 'edd_blockonomics_payment_countdown_time',

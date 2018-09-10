@@ -3,21 +3,16 @@
 <div ng-app="shopping-cart-demo">
   <div ng-controller="CheckoutController">
 
-    <?php if (edd_get_option('edd_blockonomics_accept_altcoins')) : ?>
-    <div class="bnomics-order-container" style="max-width: 800px;">
-    <?php else : ?>
     <div class="bnomics-order-container" style="max-width: 600px;">
-    <?php endif;?>
-
       <!-- Heading row -->
       <div class="bnomics-order-heading">
         <div class="bnomics-order-heading-wrapper">
           <div class="bnomics-order-id">
             <span class="bnomics-order-number" ng-cloak> <?=__('Order#', 'edd-blockonomics')?> {{order.order_id}}</span>
-            <span class="alignright ng-cloak bnomics-time-left" ng-hide="order.status != -1 || altcoin_waiting">{{clock*1000 | date:'mm:ss' : 'UTC'}}</span>
+            <span class="alignright ng-cloak bnomics-time-left" ng-hide="order.status != -1">{{clock*1000 | date:'mm:ss' : 'UTC'}}</span>
           </div>
 
-          <div ng-cloak ng-hide="order.status != -1 || altcoin_waiting" class="bnomics-progress-bar-wrapper">
+          <div ng-cloak ng-hide="order.status != -1" class="bnomics-progress-bar-wrapper">
             <div class="bnomics-progress-bar-container">
               <div class="bnomics-progress-bar" style="width: {{progress}}%;"></div>
             </div>
@@ -29,7 +24,7 @@
       <div class="bnomics-order-panel">
         <div class="bnomics-order-info">
 
-          <div class="bnomics-bitcoin-pane" ng-hide="altcoin_waiting">
+          <div class="bnomics-bitcoin-pane">
             <!-- Order Status -->
             <h4 class="bnomics-order-status-title" ng-show="order.status != -1" for="invoice-amount" style="margin-top:15px;" ng-cloak><?=__('Status', 'edd-blockonomics')?></h4>
             <div class="bnomics-order-status-wrapper">
@@ -73,29 +68,6 @@
               <?=__('Powered by ', 'edd-blockonomics')?>Blockonomics
             </div>
           </div>
-
-          <?php if (edd_get_option('edd_blockonomics_accept_altcoins')) : ?>
-          <div class="bnomics-altcoin-pane" ng-style="{'border-left': (altcoin_waiting)?'none':''}">
-
-            <div ng-hide="altcoin_waiting" ng-cloak>
-              <h4 class="bnomics-altcoin-hint"> <?=__('OR you can ', 'edd-blockonomics')?></h4>
-              <div class="bnomics-altcoin-button-wrapper">
-                <a ng-click="pay_altcoins()" href=""><img  style="margin: auto;" src="https://shapeshift.io/images/shifty/small_dark_altcoins.png"  class="ss-button"></a>
-                <div class="bnomics-altcoin-info-wrapper">
-                  <h5 class="bnomics-altcoin-info"><?=__('Ethereum, Bitcoin Cash, Dash and many others supported', 'edd-blockonomics')?></h5>
-                </div>
-              </div>
-            </div>
-
-            <div class="bnomics-altcoin-waiting" ng-show="altcoin_waiting" ng-cloak>
-              <h4 class="bnomics-altcoin-waiting-info"><?=__('Waiting for BTC payment from shapeshift altcoin conversion ', 'edd-blockonomics')?></h4>
-              <div class="bnomics-spinner"></div>
-              <h4 class="bnomics-altcoin-cancel"><a href="" ng-click="altcoin_waiting=false"> Click here</a> to cancel and go back </h4>
-            </div>
-
-          </div>
-          <?php endif ?>
-
         </div>
       </div>
     </div>
