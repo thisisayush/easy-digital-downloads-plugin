@@ -136,12 +136,6 @@ class EDD_Blockonomics
   public function edd_admin_messages() {
     global $edd_options;
 
-    $api_key = trim(edd_get_option('edd_blockonomics_api_key', ''));
-
-    if ( empty($api_key) && $_GET['section'] == 'blockonomics'  && current_user_can( 'manage_shop_settings' ) ) {
-      add_settings_error( 'edd-blockonomics-notices', 'edd_blockonomics_api_invalid', __( 'Please enter your Blockonomics API key and save changes.', 'edd-blockonomics' , 'error' ) );
-    }
-
     $errors = edd_get_errors();
     if ( ! $errors ) {
       $errors = array();
@@ -682,59 +676,68 @@ class EDD_Blockonomics
       id="generate-callback" style="font:400 20px/1 dashicons;margin-left: 7px; top: 4px;position:relative;text-decoration: none;" title="Generate New Callback URL">&#xf463;<a>';
 
     $setup_listener_url = add_query_arg(array( 'edd-listener' => 'blockonomics', 'action' => 'test_setup') ,home_url());
-
-    $api_key = trim(edd_get_option('edd_blockonomics_api_key', ''));
-    $disabled = '';
-    if ( empty($api_key) )
-    {
-      $disabled = 'disabled';
-      $setup_listener_url = '#';
-    }
-
     $test_setup = '<p><b><i>'.__('Use below button to test the configuration.', 'edd-blockonomics').'</i></b></p>
-      <p> <a id="edd-blockonomics-test-setup"  href="'.$setup_listener_url.'" '.$disabled.' class="button button-small" style="max-width:90px;">Test Setup</a> </p>
+      <p> <a id="edd-blockonomics-test-setup"  href="javascript:testSetupFunc();" class="button button-small" style="max-width:90px;">Test Setup</a> </p>
 
-  <script type="text/javascript">
-$("input[name=\'edd_settings[edd_blockonomics_api_key]\']").change(function() {
+      <script type="text/javascript">
+      var api_key = $("input[name=\'edd_settings[edd_blockonomics_api_key]\']").attr(\'value\');
+      var testSetupFunc = function() 
+      {
+        var current_api_key = $("input[name=\'edd_settings[edd_blockonomics_api_key]\']").attr(\'value\');
+        if( (current_api_key == api_key && api_key.length == 0 ) 
+                || current_api_key != api_key ) 
+        { 
+          if($("#setting-error-edd_blockonomics_api_key_changed").length == 0) 
+          {
+            /* create notice div */
+            var div = document.createElement( "div" );
+            div.classList.add( "error", "settings-warning", "notice", "is-dismissible" );
+            div.setAttribute( "id", "setting-error-edd_blockonomics_api_key_changed" );
 
-if($("#setting-error-edd_blockonomics_api_key_changed").length == 0) {
-    /* create notice div */
-    var div = document.createElement( "div" );
-    div.classList.add( "error", "settings-warning", "notice", "is-dismissible" );
-    div.setAttribute( "id", "setting-error-edd_blockonomics_api_key_changed" );
-     
-    /* create paragraph element to hold message */
-    var p = document.createElement( "p" );
-     
-    /* Add message text */
-    p.appendChild( document.createTextNode( "API Key has changed. Click on Save Changes first." ) );
-    div.appendChild( p );
- 
-    /* Create Dismiss icon */
-    var b = document.createElement( "button" );
-    b.setAttribute( "type", "button" );
-    b.classList.add( "notice-dismiss" );
- 
-    /* Add screen reader text to Dismiss icon */
-    var bSpan = document.createElement( "span" );
-    bSpan.classList.add( "screen-reader-text" );
-    bSpan.appendChild( document.createTextNode( "Dismiss this notice." ) );
-    b.appendChild( bSpan );
- 
-    /* Add Dismiss icon to notice */
-    div.appendChild( b );
- 
-    /* Insert notice after the first h2 */
-    var h2 = document.getElementsByTagName( "h2" )[0];
-    h2.parentNode.insertBefore( div, h2.nextSibling);
- 
-    /* Make the notice dismissable when the Dismiss icon is clicked */
-    b.addEventListener( "click", function () {
-        div.parentNode.removeChild( div );
-    });
-}
-});
+            /* create paragraph element to hold message */
+            var p = document.createElement( "p" );
 
+            /* Add message text */
+            if( current_api_key == api_key && api_key.length == 0)
+            {
+              p.appendChild( document.createTextNode( "Please enter your Blockonomics API key and save changes." ) );
+            }
+            else
+            {
+              p.appendChild( document.createTextNode( "API Key has changed. Click on Save Changes first." ) );
+            }
+            div.appendChild( p );
+
+            /* Create Dismiss icon */
+            var b = document.createElement( "button" );
+            b.setAttribute( "type", "button" );
+            b.classList.add( "notice-dismiss" );
+
+            /* Add screen reader text to Dismiss icon */
+            var bSpan = document.createElement( "span" );
+            bSpan.classList.add( "screen-reader-text" );
+            bSpan.appendChild( document.createTextNode( "Dismiss this notice." ) );
+            b.appendChild( bSpan );
+
+            /* Add Dismiss icon to notice */
+            div.appendChild( b );
+
+            /* Insert notice after the first h2 */
+            var h2 = document.getElementsByTagName( "h2" )[0];
+            h2.parentNode.insertBefore( div, h2.nextSibling);
+
+            /* Make the notice dismissable when the Dismiss icon is clicked */
+            b.addEventListener( "click", function () 
+            {
+              div.parentNode.removeChild( div );
+            });
+          }
+        }
+        else 
+        {
+          window.location = "'.$setup_listener_url.'";
+        }
+      };
 </script>
 ';
 
