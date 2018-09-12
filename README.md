@@ -16,7 +16,7 @@
   * Payment gateway selection.
   ![](screenshots/screenshot_1.png)
 
-  * Configuration.
+  * Blockonomics Settings.
   ![](screenshots/screenshot_2.png) 
 
   * Invoice.
