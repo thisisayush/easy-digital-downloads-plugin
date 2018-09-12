@@ -7,17 +7,14 @@
   * Open WordPress admin page.
   * Navigate to 'Plugins' -> 'Add New' -> 'Upload Plugin' and upload the zip file. 
 	* Install and Activate the plugin.
-# Configuration
   * Navigate to 'Downloads' -> 'Settings' -> 'Payment Gateways' -> 'General'
   	* Select 'Blockonomics' in 'Payment Gateways' section.
   * Navigate to 'Downloads' -> 'Settings' -> 'Payment Gateways' -> 'Blockonomics'
   	* And configure blockonomics plugin and put API_KEY
 # Screenshots
-  * Payment gateway selection.
-  ![](screenshots/screenshot_1.png)
 
   * Blockonomics Settings.
-  ![](screenshots/screenshot_2.png) 
+  ![](screenshots/screenshot_1.png) 
 
   * Invoice.
-  ![](screenshots/screenshot_3.png) 
+  ![](screenshots/screenshot_2.png) 
