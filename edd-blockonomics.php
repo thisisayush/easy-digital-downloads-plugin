@@ -141,6 +141,14 @@ class EDD_Blockonomics
       $errors = array();
     }
 
+    $api_key = trim(edd_get_option('edd_blockonomics_api_key', ''));
+    if( empty ($api_key) )
+    {
+      $error = __( '<p>Click on <b>Get Started for Free</b> on <a href=\'https://www.blockonomics.co/merchants\'
+target=\'_blank\'>Blockonomics Merchants</a>. Complete the Wizard, Copy the API Key when shown here.</p>', 'edd-blockonomics' );
+      add_settings_error( 'edd-blockonomics-notices', 'edd_blockonomics_api_key_empty', $error , 'error');
+    }
+
     if ( array_key_exists('edd_blockonomics_setup_failed', $errors ) && $_GET['section'] == 'blockonomics' 
       && current_user_can( 'manage_shop_settings' ) )
     {
@@ -700,11 +708,11 @@ class EDD_Blockonomics
             /* Add message text */
             if( current_api_key == api_key && api_key.length == 0)
             {
-              p.appendChild( document.createTextNode( "Please enter your Blockonomics API key and save changes." ) );
+              p.innerHTML = "<b>'.__('Please enter your Blockonomics API key and save changes.', 'edd-blockonomics').'</b>";
             }
             else
             {
-              p.appendChild( document.createTextNode( "API Key has changed. Click on Save Changes first." ) );
+              p.innerHTML = "<b>'.__('API Key has changed. Click on Save Changes first.', 'edd-blockonomics').'</b>";
             }
             div.appendChild( p );
 
@@ -745,6 +753,7 @@ class EDD_Blockonomics
       array(
         'id'      => 'edd_blockonomics_api_key',
         'name'    => __( 'BLOCKONOMICS API KEY', 'edd-blockonomics' ),
+        'desc'    => __( '<a href="https://www.blockonomics.co/merchants" style="text-decoration:none" target="_blank">GET API KEY</a>', 'edd-blockonomics' ),
         'type'    => 'text'
       ),
       array(
