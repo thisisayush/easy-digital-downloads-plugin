@@ -141,14 +141,7 @@ class EDD_Blockonomics
       $errors = array();
     }
 
-    $api_key = trim(edd_get_option('edd_blockonomics_api_key', ''));
-    if( empty ($api_key) )
-    {
-      $error = __( '<p>Click on <b>Get Started for Free</b> on <a href=\'https://www.blockonomics.co/merchants\'
-target=\'_blank\'>Blockonomics Merchants</a>. Complete the Wizard, Copy the API Key when shown here.</p>', 'edd-blockonomics' );
-      add_settings_error( 'edd-blockonomics-notices', 'edd_blockonomics_api_key_empty', $error , 'error');
-    }
-
+  
     if ( array_key_exists('edd_blockonomics_setup_failed', $errors ) && $_GET['section'] == 'blockonomics' 
       && current_user_can( 'manage_shop_settings' ) )
     {
@@ -689,6 +682,14 @@ target=\'_blank\'>Blockonomics Merchants</a>. Complete the Wizard, Copy the API 
 
       <script type="text/javascript">
       var api_key = $("input[name=\'edd_settings[edd_blockonomics_api_key]\']").attr(\'value\');
+
+      if(api_key.length == 0)
+      {
+        var setting_table = $("input[name=\'edd_settings[edd_blockonomics_api_key]\']").closest("table");
+        setting_table.before("'.__('<p>You are few clicks away from accepting bitcoin payments</p>', 'edd-blockonomics')
+                      .__('<p>Click on <b>Get Started for Free</b> on <a href=\'https://www.blockonomics.co/merchants\' target=\'_blank\'>Blockonomics Merchants</a>. Complete the Wizard, Copy the API Key when shown here</p>', 'edd-blockonomics').'");
+      }
+
       var testSetupFunc = function() 
       {
         var current_api_key = $("input[name=\'edd_settings[edd_blockonomics_api_key]\']").attr(\'value\');
@@ -753,7 +754,6 @@ target=\'_blank\'>Blockonomics Merchants</a>. Complete the Wizard, Copy the API 
       array(
         'id'      => 'edd_blockonomics_api_key',
         'name'    => __( 'BLOCKONOMICS API KEY', 'edd-blockonomics' ),
-        'desc'    => __( '<a href="https://www.blockonomics.co/merchants" style="text-decoration:none" target="_blank">GET API KEY</a>', 'edd-blockonomics' ),
         'type'    => 'text'
       ),
       array(
