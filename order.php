@@ -1,3 +1,5 @@
+<?php get_header();?>
+
 <div ng-app="shopping-cart-demo">
   <div ng-controller="CheckoutController">
 
@@ -80,3 +82,5 @@
     <script src="<?php echo plugins_url('js/reconnecting-websocket.min.js', __FILE__);?>"></script>
   </div>
 </div>
+
+<?php get_footer();?>
