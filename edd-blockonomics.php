@@ -133,21 +133,16 @@ class EDD_Blockonomics
     }
   }
   
-  public function edd_admin_messages() {
-    global $edd_options;
-
-    $errors = edd_get_errors();
-    if ( ! $errors ) {
-      $errors = array();
-    }
-
+  function edd_admin_messages() {
+    //edd_set_error("sample_error", "sample_error");
+    $errors = edd_get_option('edd_blockonomics_errors');
   
     if ( array_key_exists('edd_blockonomics_setup_failed', $errors ) && $_GET['section'] == 'blockonomics' 
       && current_user_can( 'manage_shop_settings' ) )
     {
       $error = $errors[ 'edd_blockonomics_setup_failed' ];
       add_settings_error( 'edd-blockonomics-notices', 'edd_blockonomics_setup_failed', $error , 'error');
-      edd_unset_error('edd_blockonomics_setup_failed');
+      $this->unset_blockonomics_error('edd_blockonomics_setup_failed');
     }
 
     if ( array_key_exists('edd_blockonomics_setup_success', $errors ) && $_GET['section'] == 'blockonomics' 
@@ -155,7 +150,7 @@ class EDD_Blockonomics
     {
       $error = $errors[ 'edd_blockonomics_setup_success' ];
       add_settings_error( 'edd-blockonomics-notices', 'edd_blockonomics_setup_success', $error , 'updated');
-      edd_unset_error('edd_blockonomics_setup_success');
+      $this->unset_blockonomics_error('edd_blockonomics_setup_success');
     }
 
     settings_errors( 'edd-blockonomics-notices' );
@@ -235,7 +230,7 @@ class EDD_Blockonomics
     $api_key = trim(edd_get_option('edd_blockonomics_api_key', ''));
     if( empty ($api_key) )
     {
-      edd_set_error( 'edd_blockonomics_api_invalid', __( 'Please enter your Blockonomics API key and secret in Settings', 'edd-blockonomics' ) );
+      $this->set_blockonomics_error( 'edd_blockonomics_api_invalid', __( 'Please enter your Blockonomics API key and secret in Settings', 'edd-blockonomics' ) );
       edd_send_back_to_checkout( '?payment-mode=blockonomics' );
     }
 
@@ -470,6 +465,20 @@ class EDD_Blockonomics
     return false;
   }
 
+  public function set_blockonomics_error($id, $value)
+  {
+    $errors = edd_get_option('edd_blockonomics_errors', array() );
+    $errors[$id] = $value;
+    edd_update_option('edd_blockonomics_errors', $errors);
+  }
+
+  public function unset_blockonomics_error($id)
+  {
+    $errors = edd_get_option('edd_blockonomics_errors', array() );
+    unset($errors[$id]);
+    edd_update_option('edd_blockonomics_errors', $errors);
+  }
+
   public function listener()
   {
     if( empty( $_GET['edd-listener'] ) )
@@ -501,7 +510,7 @@ class EDD_Blockonomics
         if($urls_count == '2')
         {
           $message = __("Seems that you have set multiple xPubs or you already have a Callback URL set. <a href='https://blockonomics.freshdesk.com/support/solutions/articles/33000209399-merchants-integrating-multiple-websites' target='_blank'>Here is a guide</a> to setup multiple websites.", 'edd-blockonomics');
-          edd_set_error('edd_blockonomics_setup_failed', $message );
+          $this->set_blockonomics_error('edd_blockonomics_setup_failed', $message );
           wp_redirect($settings_page);
           exit;
         }
@@ -511,14 +520,14 @@ class EDD_Blockonomics
         if($setup_errors)
         {
           $message = __($setup_errors . '</p><p>For more information, please consult <a href="https://blockonomics.freshdesk.com/support/solutions/articles/33000215104-troubleshooting-unable-to-generate-new-address" target="_blank">this troubleshooting article</a></p>', 'edd-blockonomics');
-          edd_set_error('edd_blockonomics_setup_failed', $message );
+          $this->set_blockonomics_error('edd_blockonomics_setup_failed', $message );
           wp_redirect($settings_page);
           exit;
         }
         else
         {
           $message = __('Congrats ! Setup is all done', 'edd-blockonomics');
-          edd_set_error('edd_blockonomics_setup_success', $message );
+          $this->set_blockonomics_error('edd_blockonomics_setup_success', $message );
           wp_redirect($settings_page);
           exit;
         }
