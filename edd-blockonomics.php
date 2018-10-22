@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: Easy Digital Downloads - Blockonomics
- * Description: Accept Bitcoin Payments on your EasyDigitalDownloads-powered website with Blockonomics
- * Version: 1.5.1
+ * Plugin Name: Bitcoin Easy Digital Downloads - Blockonomics
+ * Description: Accept Bitcoin Payments on your Easy Digital Downloads powered website with Blockonomics
+ * Version: 1.0
  * Author: Blockonomics
  * Author URI: https://www.blockonomics.co
  * License: MIT
