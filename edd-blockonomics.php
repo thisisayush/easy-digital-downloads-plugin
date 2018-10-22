@@ -149,7 +149,7 @@ class EDD_Blockonomics
       }
       else
       {
-        $message = __('Congrats ! Setup is all done', 'blockonomics-bitcoin-payments');
+        $message = __('Congrats ! Setup is all done', 'edd-blockonomics');
         $type = 'updated';
         add_settings_error( 'edd-blockonomics-notices', 'edd_blockonomics_setup_success', $message , $type);
       }
