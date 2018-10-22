@@ -271,9 +271,9 @@ class EDD_Blockonomics
         $responseObj = $blockonomics->new_address($api_key, $callback_secret);
         $price = $blockonomics->get_price(edd_get_currency());
 
-        if($responseObj->response_code != 'HTTP/1.1 200 OK')
+        if($responseObj->response_code != 200)
         {
-          edd_record_gateway_error( __( 'Error while getting BTC price', 'edd-blockonomics' ) );
+          edd_record_gateway_error( __( 'Error while getting BTC Address', 'edd-blockonomics' ) );
           return;
         }
 
