@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Bitcoin Easy Digital Downloads - Blockonomics
+ * Plugin Name: EDD - Blockonomics
  * Description: Accept Bitcoin Payments on your Easy Digital Downloads powered website with Blockonomics
  * Version: 1.0
  * Author: Blockonomics
