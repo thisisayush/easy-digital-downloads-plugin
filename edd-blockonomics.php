@@ -133,29 +133,26 @@ class EDD_Blockonomics
     }
   }
   
-  public function edd_admin_messages() {
-    global $edd_options;
-
-    $errors = edd_get_errors();
-    if ( ! $errors ) {
-      $errors = array();
-    }
-
-  
-    if ( array_key_exists('edd_blockonomics_setup_failed', $errors ) && $_GET['section'] == 'blockonomics' 
-      && current_user_can( 'manage_shop_settings' ) )
+  public function edd_admin_messages() 
+  {
+    if (isset($_GET['edd-action']) && $_GET['edd-action'] == 'testsetup' && 
+        !isset($_GET['settings-updated']))
     {
-      $error = $errors[ 'edd_blockonomics_setup_failed' ];
-      add_settings_error( 'edd-blockonomics-notices', 'edd_blockonomics_setup_failed', $error , 'error');
-      edd_unset_error('edd_blockonomics_setup_failed');
-    }
+      error_log('Inside test setup.');
+      $setup_errors = $this->testSetup();
 
-    if ( array_key_exists('edd_blockonomics_setup_success', $errors ) && $_GET['section'] == 'blockonomics' 
-      && current_user_can( 'manage_shop_settings' ) )
-    {
-      $error = $errors[ 'edd_blockonomics_setup_success' ];
-      add_settings_error( 'edd-blockonomics-notices', 'edd_blockonomics_setup_success', $error , 'updated');
-      edd_unset_error('edd_blockonomics_setup_success');
+      if($setup_errors)
+      {
+        $message = $setup_errors;
+        $type = 'error';
+        add_settings_error( 'edd-blockonomics-notices', 'edd_blockonomics_setup_failed', $message , $type);
+      }
+      else
+      {
+        $message = __('Congrats ! Setup is all done', 'blockonomics-bitcoin-payments');
+        $type = 'updated';
+        add_settings_error( 'edd-blockonomics-notices', 'edd_blockonomics_setup_success', $message , $type);
+      }
     }
 
     settings_errors( 'edd-blockonomics-notices' );
@@ -274,9 +271,9 @@ class EDD_Blockonomics
         $responseObj = $blockonomics->new_address($api_key, $callback_secret);
         $price = $blockonomics->get_price(edd_get_currency());
 
-        if($responseObj->response_code != 'HTTP/1.1 200 OK')
+        if($responseObj->response_code != 200)
         {
-          edd_record_gateway_error( __( 'Error while getting BTC price', 'edd-blockonomics' ) );
+          edd_record_gateway_error( __( 'Error while getting BTC Address', 'edd-blockonomics' ) );
           return;
         }
 
@@ -333,137 +330,75 @@ class EDD_Blockonomics
     );
   }
 
-  /**
-   * Check the status of callback urls
-   * If no xPubs set, return
-   * If one xPub is set without callback url, set the url
-   * If more than one xPubs are set, give instructions on integrating to multiple sites
-   * @return Strin Count of found xPubs
-   */
-  function check_callback_urls()
-  {
-    $blockonomics = new BlockonomicsAPI;
-    $responseObj = $blockonomics->get_xpubs(edd_get_option('edd_blockonomics_api_key'));
-
-    // No xPubs set
-    if (count($responseObj) == 0)
-    {
-      return "0";
-    }
-
-    // One xPub set
-    if (count($responseObj) == 1)
-    {
-      $callback_secret = trim(edd_get_option('edd_blockonomics_callback_secret'));
-      $callback_url = add_query_arg( array( 'edd-listener' => 'blockonomics', 'secret' => $callback_secret ), home_url() );
-
-      // No Callback URL set, set one
-      if(!$responseObj[0]->callback || $responseObj[0]->callback == null)
-      {
-        $this->update_callback_url($callback_url, $responseObj[0]->address, $blockonomics);
-        return "1";
-      }
-      // One xPub with one Callback URL
-      else
-      {
-        if($responseObj[0]->callback == $callback_url)
-        {
-          return "1";
-        }
-
-        // Check if only secret differs
-        $callback_without_secret =  add_query_arg( 'edd-listener', 'blockonomics', home_url());
-        if(strpos($responseObj[0]->callback, $callback_without_secret ) !== false)
-        {
-          $this->update_callback_url($callback_url, $responseObj[0]->address, $blockonomics);
-          return "1";
-        }
-
-        return "2";
-      }
-    }
-
-    if (count($responseObj) > 1)
-    {
-      $callback_secret = edd_get_option('edd_blockonomics_callback_secret');
-      $callback_url = add_query_arg('edd-listener', 'blockonomics', home_url());
-      $callback_url = add_query_arg('secret', $callback_secret, $callback_url);
-
-      // Check if callback url is set
-      foreach ($responseObj as $resObj) {
-        if($resObj->callback == $callback_url)
-        {
-          return "1";
-        }
-      }
-      return "2";
-    }
-  }
-
   function testSetup()
-  {
+  {	
+    $api_key = edd_get_option('edd_blockonomics_api_key');
     $blockonomics = new BlockonomicsAPI;
-    $responseObj = $blockonomics->new_address(edd_get_option('edd_blockonomics_api_key'),
-      edd_get_option("edd_blockonomics_callback_secret"), true);
-
-    error_log(print_r($responseObj, true));
-
-    if(!ini_get('allow_url_fopen'))
-    {
-      $error_str = __('<i>allow_url_fopen</i> is not enabled, please enable this in php.ini', 'edd-blockonomics');
-
+    $response = $blockonomics->get_callbacks($api_key);
+    $error_str = '';
+    $responseBody = json_decode(wp_remote_retrieve_body($response));
+    $callback_secret = edd_get_option("edd_blockonomics_callback_secret");
+    $api_url = add_query_arg('edd-listener', 'blockonomics', home_url() );
+    $callback_url = add_query_arg('secret', $callback_secret, $api_url);
+    // Remove http:// or https:// from urls
+    $api_url_without_schema = preg_replace('/https?:\/\//', '', $api_url);
+    $callback_url_without_schema = preg_replace('/https?:\/\//', '', $callback_url);
+    $response_callback_without_schema = preg_replace('/https?:\/\//', '', $responseBody[0]->callback);
+    //TODO: Check This: WE should actually check code for timeout
+    if (!wp_remote_retrieve_response_code($response)) {
+        $error_str = __('Your server is blocking outgoing HTTPS calls', 'edd-blockonomics');
     }
-    elseif( !isset($responseObj->response_code))
+    elseif (wp_remote_retrieve_response_code($response)==401)
+        $error_str = __('API Key is incorrect', 'edd-blockonomics');
+    elseif (wp_remote_retrieve_response_code($response)!=200)  
+        $error_str = $response->data;
+    elseif (!isset($responseBody) || count($responseBody) == 0)
     {
-      $error_str = __('Your webhost is blocking outgoing HTTPS connections. Blockonomics requires an outgoing HTTPS POST (port 443) to generate new address. Check with your webhosting provider to allow this.', 'edd-blockonomics');
+        $error_str = __('You have not entered an xpub', 'edd-blockonomics');
     }
-    else
+    elseif (count($responseBody) == 1)
     {
-      switch ($responseObj->response_code)
-      {
-      case 'HTTP/1.1 200 OK':
-        break;
-
-      case 'HTTP/1.1 401 Unauthorized':
-      {
-        $error_str = __('API Key is incorrect. Make sure that the API key set in admin Blockonomics module configuration is correct.', 'edd-blockonomics');
-        break;
-      }
-
-      case 'HTTP/1.1 500 Internal Server Error':
-      {
-        if(isset($responseObj->message))
+        if(!$responseBody[0]->callback || $responseBody[0]->callback == null)
         {
-          $error_code = $responseObj->message;
-
-          switch ($error_code) {
-          case "Could not find matching xpub":
-            $error_str = __('There is a problem in the Callback URL. Make sure that you have set your Callback URL from the admin Blockonomics module configuration to your Merchants > Settings.', 'edd-blockonomics');
-            break;
-          case "This require you to add an xpub in your wallet watcher":
-            $error_str = __('There is a problem in the XPUB. Make sure that the you have added an address to Wallet Watcher > Address Watcher. If you have added an address make sure that it is an XPUB address and not a Bitcoin address.', 'edd-blockonomics');
-            break;
-          default:
-            $error_str = $responseObj->message;
+          //No callback URL set, set one 
+          $blockonomics->update_callback($api_key, $callback_url, $responseBody[0]->address);   
+        }
+        elseif($response_callback_without_schema != $callback_url_without_schema)
+        {
+          $base_url = get_bloginfo('wpurl');
+          $base_url = preg_replace('/https?:\/\//', '', $base_url);
+          // Check if only secret differs
+          if(strpos($responseBody[0]->callback, $base_url) !== false)
+          {
+            //Looks like the user regenrated callback by mistake
+            //Just force Update_callback on server
+            $blockonomics->update_callback($api_key, $callback_url, $responseBody[0]->address);  
           }
-          break;
+          else
+          {
+            $error_str = __("You have an existing callback URL. Refer instructions on integrating multiple websites", 'edd-blockonomics');
+          }
         }
-        else
-        {
-          $error_str = $responseObj->response_code;
-          break;
-        }
-      }
-
-      default:
-      $error_str = $responseObj->response_code;
-      break;
-      }
     }
-
-    if(isset($error_str))
+    else 
     {
-      return $error_str;
+        // Check if callback url is set
+        foreach ($responseBody as $resObj)
+         if(preg_replace('/https?:\/\//', '', $resObj->callback) == $callback_url_without_schema)
+            return "";
+        $error_str = __("You have an existing callback URL. Refer instructions on integrating multiple websites", 'edd-blockonomics');
+    }  
+    if (!$error_str)
+    {
+        //Everything OK ! Test address generation
+        $response= $blockonomics->new_address($api_key, $callback_secret, true);
+        if ($response->response_code!=200){
+          $error_str = $response->response_message;
+        }
+    }
+    if($error_str) {
+        $error_str = $error_str . __('<p>For more information, please consult <a href="https://blockonomics.freshdesk.com/support/solutions/articles/33000215104-troubleshooting-unable-to-generate-new-address" target="_blank">this troubleshooting article</a></p>', 'edd-blockonomics');
+        return $error_str;
     }
 
     // No errors
@@ -492,37 +427,8 @@ class EDD_Blockonomics
         wp_redirect($settings_page);
         exit;
       }
-      else if ($action == "test_setup")
-      {
-        error_log('Inside test setup.');
-        $urls_count = $this->check_callback_urls();
-        
-        error_log( print_r($urls_count, true) );
-        if($urls_count == '2')
-        {
-          $message = __("Seems that you have set multiple xPubs or you already have a Callback URL set. <a href='https://blockonomics.freshdesk.com/support/solutions/articles/33000209399-merchants-integrating-multiple-websites' target='_blank'>Here is a guide</a> to setup multiple websites.", 'edd-blockonomics');
-          edd_set_error('edd_blockonomics_setup_failed', $message );
-          wp_redirect($settings_page);
-          exit;
-        }
-
-        $setup_errors = $this->testSetup();
-
-        if($setup_errors)
-        {
-          $message = __($setup_errors . '</p><p>For more information, please consult <a href="https://blockonomics.freshdesk.com/support/solutions/articles/33000215104-troubleshooting-unable-to-generate-new-address" target="_blank">this troubleshooting article</a></p>', 'edd-blockonomics');
-          edd_set_error('edd_blockonomics_setup_failed', $message );
-          wp_redirect($settings_page);
-          exit;
-        }
-        else
-        {
-          $message = __('Congrats ! Setup is all done', 'edd-blockonomics');
-          edd_set_error('edd_blockonomics_setup_success', $message );
-          wp_redirect($settings_page);
-          exit;
-        }
-      }
+      
+      
     }
 
     $orders = edd_get_option('edd_blockonomics_orders');
@@ -676,13 +582,16 @@ class EDD_Blockonomics
     $callback_refresh = __( 'CALLBACK URL', 'edd-blockonomics' ).'<a href="'.$callback_update_url.'"
       id="generate-callback" style="font:400 20px/1 dashicons;margin-left: 7px; top: 4px;position:relative;text-decoration: none;" title="Generate New Callback URL">&#xf463;<a>';
 
-    $setup_listener_url = add_query_arg(array( 'edd-listener' => 'blockonomics', 'action' => 'test_setup') ,home_url());
+    //$settings_page_testsetup = add_query_arg(array( 'edd-listener' => 'blockonomics', 'action' => 'test_setup') ,home_url());
+    $settings_page_testsetup = admin_url( 'edit.php?post_type=download&page=edd-settings&tab=gateways&section=blockonomics&edd-action=testsetup');
+    $settings_page = admin_url( 'edit.php?post_type=download&page=edd-settings&tab=gateways&section=blockonomics');
     $test_setup = '<p><b><i>'.__('Use below button to test the configuration.', 'edd-blockonomics').'</i></b></p>
       <p> <a id="edd-blockonomics-test-setup"  href="javascript:testSetupFunc();" class="button button-small" style="max-width:90px;">Test Setup</a> </p>
 
       <script type="text/javascript">
       var api_key = $("input[name=\'edd_settings[edd_blockonomics_api_key]\']").attr(\'value\');
 
+      history.pushState({}, document.title, "'.$settings_page.'");
       if(api_key.length == 0)
       {
         var setting_table = $("input[name=\'edd_settings[edd_blockonomics_api_key]\']").closest("table");
@@ -744,7 +653,7 @@ class EDD_Blockonomics
         }
         else 
         {
-          window.location = "'.$setup_listener_url.'";
+          window.location = "'.$settings_page_testsetup.'";
         }
       };
 </script>
@@ -788,11 +697,11 @@ class EDD_Blockonomics
   }
 }
 
+/*Call back method for the setting 'testsetup'*/
 function edd_testsetup_callback()
 {
   printf("");
 }
-
 
 function edd_blockonomics_init()
 {
