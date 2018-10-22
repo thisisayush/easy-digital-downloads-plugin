@@ -24,7 +24,7 @@ class BlockonomicsAPI
         {
             $get_params = "?match_callback=$secret";
         }
-        $url = Blockonomics::NEW_ADDRESS_URL.$get_params;
+        $url = BlockonomicsAPI::NEW_ADDRESS_URL.$get_params;
         $response = $this->post($url, $api_key);
         if (!isset($responseObj)) $responseObj = new stdClass();
         $responseObj->{'response_code'} = wp_remote_retrieve_response_code($response);
@@ -39,21 +39,21 @@ class BlockonomicsAPI
 
     public function get_price($currency)
     {
-    	$url = Blockonomics::PRICE_URL. "?currency=$currency";
+    	$url = BlockonomicsAPI::PRICE_URL. "?currency=$currency";
         $response = $this->get($url);
         return json_decode(wp_remote_retrieve_body($response))->price;
     }
 
     public function get_xpubs($api_key)
     {
-    	$url = Blockonomics::ADDRESS_URL;
+    	$url = BlockonomicsAPI::ADDRESS_URL;
         $response = $this->get($url, $api_key);
         return json_decode(wp_remote_retrieve_body($response));
     }
 
     public function update_callback($api_key, $callback_url, $xpub)
     {
-    	$url = Blockonomics::SET_CALLBACK_URL;
+    	$url = BlockonomicsAPI::SET_CALLBACK_URL;
     	$body = json_encode(array('callback' => $callback_url, 'xpub' => $xpub));
     	$response = $this->post($url, $api_key, $body);
         return json_decode(wp_remote_retrieve_body($response));
@@ -61,7 +61,7 @@ class BlockonomicsAPI
 
     public function get_callbacks($api_key)
     {
-    	$url = Blockonomics::GET_CALLBACKS_URL;
+    	$url = BlockonomicsAPI::GET_CALLBACKS_URL;
     	$response = $this->get($url, $api_key);
         return $response;
     }
