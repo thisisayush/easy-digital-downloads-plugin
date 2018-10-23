@@ -138,7 +138,6 @@ class EDD_Blockonomics
     if (isset($_GET['edd-action']) && $_GET['edd-action'] == 'testsetup' && 
         !isset($_GET['settings-updated']))
     {
-      error_log('Inside test setup.');
       $setup_errors = $this->testSetup();
 
       if($setup_errors)
@@ -442,21 +441,15 @@ class EDD_Blockonomics
     $address = sanitize_text_field($_REQUEST["finish_order"]);
     if ($address)
     {
-      error_log('finish order');
       $order = $orders[$address];
-      error_log(print_r($order, true));
-      error_log(edd_get_success_page_uri());
       wp_redirect(edd_get_success_page_uri());
       exit;
     }
 
     $address = sanitize_text_field($_REQUEST['get_order']);
-    error_log('Inside listener() method.');
-    error_log(print_r($address, true));
 
     if ($address)
     {
-      error_log('Get Order.');
       header("Content-Type: application/json");
       exit(json_encode($orders[$address]));
     }
@@ -465,18 +458,12 @@ class EDD_Blockonomics
     {
       $callback_secret = edd_get_option("edd_blockonomics_callback_secret");
       $secret = sanitize_text_field($_REQUEST['secret']);
-      error_log('Inside status check.');
-      error_log(print_r($secret, true));
-      error_log(print_r($callback_secret, true));
 
       if ($callback_secret  && $callback_secret == $secret)
       {
         $addr = sanitize_text_field($_REQUEST['addr']);
         $order = $orders[$addr];
         $order_id = $order['order_id'];
-
-        error_log(print_r($order_id, true));
-        error_log(print_r($order, true));
 
         if ($order_id)
         {
@@ -519,8 +506,6 @@ class EDD_Blockonomics
           $order['txid'] =  sanitize_key($_REQUEST['txid']);
           $order['status'] = $status;
           $orders[$addr] = $order;
-          error_log('tx id.');
-          error_log(print_r($order['txid'] , true));
 		  
           if ($existing_status == -1)
           {
