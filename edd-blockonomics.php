@@ -417,7 +417,7 @@ class EDD_Blockonomics
       return;
     }
 
-    $action = isset($_REQUEST["action"]) ? $_REQUEST["action"] : "";
+    $action = sanitize_key($_REQUEST["action"]);
     if( !empty($action) )
     {
       $settings_page = admin_url( 'edit.php?post_type=download&page=edd-settings&tab=gateways&section=blockonomics');
@@ -432,14 +432,14 @@ class EDD_Blockonomics
     }
 
     $orders = edd_get_option('edd_blockonomics_orders');
-    $address = isset($_REQUEST["show_order"]) ? $_REQUEST["show_order"] : "";
+    $address = sanitize_text_field($_REQUEST["show_order"]);
     if ($address)
     {
       include plugin_dir_path(__FILE__)."order.php";
       exit();
     }
 
-    $address = isset($_REQUEST["finish_order"]) ? $_REQUEST["finish_order"] : "";
+    $address = sanitize_text_field($_REQUEST["finish_order"]);
     if ($address)
     {
       error_log('finish order');
@@ -450,7 +450,7 @@ class EDD_Blockonomics
       exit;
     }
 
-    $address = isset($_REQUEST['get_order']) ? $_REQUEST['get_order'] : "";
+    $address = sanitize_text_field($_REQUEST['get_order']);
     error_log('Inside listener() method.');
     error_log(print_r($address, true));
 
@@ -464,14 +464,14 @@ class EDD_Blockonomics
     try
     {
       $callback_secret = edd_get_option("edd_blockonomics_callback_secret");
-      $secret = isset($_REQUEST['secret']) ? $_REQUEST['secret'] : "";
+      $secret = sanitize_text_field($_REQUEST['secret']);
       error_log('Inside status check.');
       error_log(print_r($secret, true));
       error_log(print_r($callback_secret, true));
 
       if ($callback_secret  && $callback_secret == $secret)
       {
-        $addr = $_REQUEST['addr'];
+        $addr = sanitize_text_field($_REQUEST['addr']);
         $order = $orders[$addr];
         $order_id = $order['order_id'];
 
@@ -480,7 +480,7 @@ class EDD_Blockonomics
 
         if ($order_id)
         {
-          $status = intval($_REQUEST['status']);
+          $status = intval(sanitize_key($_REQUEST['status']));
           $existing_status = $order['status'];
           $timestamp = $order['timestamp'];
           $time_period = edd_get_option("edd_blockonomics_timeperiod", 10) *60;
@@ -493,11 +493,12 @@ class EDD_Blockonomics
           elseif ($status == 2)
           {
             $payment = new EDD_Payment( $order_id );
+            $value = intval(sanitize_key($_REQUEST['value']));
             $meta_data = $payment->get_meta();
-            $meta_data['paid_btc_amount'] = $_REQUEST['value']/1.0e8;
+            $meta_data['paid_btc_amount'] = $value/1.0e8;
             $payment->update_meta( '_edd_payment_meta', $meta_data ); 
 			
-            if ($order['satoshi'] > $_REQUEST['value'])
+            if ($order['satoshi'] > $value)
             {
               $status = -2; //Payment error , amount not matching
               edd_insert_payment_note($order_id, __('Paid BTC amount less than expected.','edd-blockonomics'));
@@ -505,7 +506,7 @@ class EDD_Blockonomics
             }
             else
             {
-              if ($order['satoshi'] < $_REQUEST['value'])
+              if ($order['satoshi'] < $value)
               {
                 edd_insert_payment_note($order_id, __('Overpayment of BTC amount', 'edd-blockonomics'));
               }
@@ -515,7 +516,7 @@ class EDD_Blockonomics
             }
           }
 
-          $order['txid'] =  $_REQUEST['txid'];
+          $order['txid'] =  sanitize_key($_REQUEST['txid']);
           $order['status'] = $status;
           $orders[$addr] = $order;
           error_log('tx id.');
