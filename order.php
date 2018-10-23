@@ -69,7 +69,6 @@
     <script>
     var blockonomics_time_period=<?php echo edd_get_option('edd_blockonomics_payment_countdown_time', 10); ?>;
     </script>
-    <script>
     <?php  
       wp_enqueue_script( 'angular', plugins_url('js/angular.min.js', __FILE__), array('jquery') );
       wp_enqueue_script( 'angular-resource', plugins_url('js/angular-resource.min.js', __FILE__), array('jquery') );
