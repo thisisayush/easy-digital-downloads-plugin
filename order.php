@@ -1,8 +1,6 @@
 <?php get_header();?>
-
 <div ng-app="shopping-cart-demo">
   <div ng-controller="CheckoutController">
-
     <div class="bnomics-order-container" style="max-width: 600px;">
       <!-- Heading row -->
       <div class="bnomics-order-heading">
@@ -64,9 +62,6 @@
             <div class="bnomics-address">
               <input class="bnomics-address-input" type="text" ng-value="order.address" readonly="readonly">
             </div>
-            <div class="bnomics-powered-by">
-              <?=__('Powered by ', 'edd-blockonomics')?>Blockonomics
-            </div>
           </div>
         </div>
       </div>
@@ -74,12 +69,17 @@
     <script>
     var blockonomics_time_period=<?php echo edd_get_option('edd_blockonomics_payment_countdown_time', 10); ?>;
     </script>
-    <script src="<?php echo plugins_url('js/angular.min.js', __FILE__);?>"></script>
-    <script src="<?php echo plugins_url('js/angular-resource.min.js', __FILE__);?>"></script>
-    <script src="<?php echo plugins_url('js/app.js', __FILE__);?>"></script>
-    <script src="<?php echo plugins_url('js/angular-qrcode.js', __FILE__);?>"></script>
-    <script src="<?php echo plugins_url('js/vendors.min.js', __FILE__);?>"></script>
-    <script src="<?php echo plugins_url('js/reconnecting-websocket.min.js', __FILE__);?>"></script>
+    <script>
+    <?php  
+      wp_enqueue_script( 'angular', plugins_url('js/angular.min.js', __FILE__), array('jquery') );
+      wp_enqueue_script( 'angular-resource', plugins_url('js/angular-resource.min.js', __FILE__), array('jquery') );
+      wp_enqueue_script( 'app', plugins_url('js/app.js', __FILE__), array('jquery') );
+                        wp_localize_script( 'app', 'my_ajax_object',
+                            array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+      wp_enqueue_script( 'angular-qrcode', plugins_url('js/angular-qrcode.js', __FILE__), array('jquery') );
+      wp_enqueue_script( 'vendors', plugins_url('js/vendors.min.js', __FILE__), array('jquery') );
+      wp_enqueue_script( 'reconnecting-websocket', plugins_url('js/reconnecting-websocket.min.js', __FILE__), array('jquery') );
+    ?>
   </div>
 </div>
 
