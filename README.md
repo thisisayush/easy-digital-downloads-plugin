@@ -1,8 +1,8 @@
 # Bitcoin Easy Digital Downloads - Blockonomics # 
 **Tags:** bitcoin, accept bitcoin, easy digital downloads, edd, bitcoin payments 
 **Requires at least:** 3.0.1 
-**Tested up to:** 4.9.8 
-**Stable tag:** 1.0
+**Tested up to:** 5.1 
+**Stable tag:** 1.1
 **License:** MIT 
 **License URI:** http://opensource.org/licenses/MIT 
 
@@ -40,8 +40,8 @@ Use bitcoin to pay and enjoy !
 
 ## Screenshots ## 
 
-* Blockonomics Settings
 ![](assets-wp-repo/screenshot_1.png) 
+Blockonomics Settings
 
-* Invoice.
 ![](assets-wp-repo/screenshot_2.png) 
+Invoice
