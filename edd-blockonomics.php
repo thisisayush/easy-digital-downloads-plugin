@@ -57,8 +57,8 @@ class EDD_Blockonomics
     add_action( 'init',                         array( $this, 'textdomain' ) );
     add_action( 'edd_gateway_blockonomics',         array( $this, 'process_payment' ) );
     add_action( 'init',                         array( $this, 'listener' ) );
-    //	add_action( 'template_redirect',            array( $this, 'process_failed_payment' ) );
-    //	add_action( 'parse_query',                  array( $this, 'strip_order_arg' ) );
+    //  add_action( 'template_redirect',            array( $this, 'process_failed_payment' ) );
+    //  add_action( 'parse_query',                  array( $this, 'strip_order_arg' ) );
     add_action( 'edd_blockonomics_cc_form',         '__return_false' );
     add_action( 'admin_notices',        array($this, 'edd_admin_messages') );
 
@@ -127,6 +127,18 @@ class EDD_Blockonomics
       <p>
         <span class="label"><?php _e( 'Actual BTC Amount:', 'edd-blockonomics' ); ?></span>&nbsp;
         <span><?php echo $meta_data['paid_btc_amount']; ?></span>
+      </p>
+    </div>
+<?php
+    }
+
+    if ( !empty($meta_data['flyp_uuid']) )
+    {
+?>
+    <div class="edd-order-tx-id edd-admin-box-inside">
+      <p>
+        <span class="label"><?php _e( 'Flyp uuid:', 'edd-blockonomics' ); ?></span>&nbsp;
+        <span><?php echo $meta_data['flyp_uuid']; ?></span>
       </p>
     </div>
 <?php
@@ -332,7 +344,7 @@ class EDD_Blockonomics
   }
 
   function testSetup()
-  {	
+  { 
     $api_key = edd_get_option('edd_blockonomics_api_key');
     $blockonomics = new BlockonomicsAPI;
     $response = $blockonomics->get_callbacks($api_key);
@@ -430,10 +442,14 @@ class EDD_Blockonomics
 
     $orders = edd_get_option('edd_blockonomics_orders');
     $address = sanitize_text_field($_REQUEST["show_order"]);
+    $uuid = sanitize_text_field($_REQUEST["uuid"]);
     if ($address)
     {
       include plugin_dir_path(__FILE__)."order.php";
       exit();
+    }else if ($uuid){
+        include plugin_dir_path(__FILE__)."track.php";
+        exit();
     }
 
     $address = sanitize_text_field($_REQUEST["finish_order"]);
@@ -482,7 +498,7 @@ class EDD_Blockonomics
             $meta_data = $payment->get_meta();
             $meta_data['paid_btc_amount'] = $value/1.0e8;
             $payment->update_meta( '_edd_payment_meta', $meta_data ); 
-			
+      
             if ($order['satoshi'] > $value)
             {
               $status = -2; //Payment error , amount not matching
@@ -504,7 +520,7 @@ class EDD_Blockonomics
           $order['txid'] =  sanitize_key($_REQUEST['txid']);
           $order['status'] = $status;
           $orders[$addr] = $order;
-		  
+      
           if ($existing_status == -1)
           {
             $payment = new EDD_Payment( $order_id );
@@ -514,7 +530,7 @@ class EDD_Blockonomics
             $meta_data['bitcoin_address'] =  $addr;
             $payment->update_meta( '_edd_payment_meta', $meta_data ); 
           }
-		  
+      
           edd_update_option('edd_blockonomics_orders', $orders);
         }
       }
@@ -656,6 +672,11 @@ class EDD_Blockonomics
         'type'    => 'text'
       ),
       array(
+        'id'      => 'edd_blockonomics_altcoins',
+        'name'    => __('Accept Altcoin Payments (Using Flyp.me)', 'edd-blockonomics'),
+        'type'    => 'checkbox'
+      ),
+      array(
         'id'      => 'edd_blockonomics_payment_countdown_time',
         'name'    => __('Time period of countdown timer on payment page (in minutes)', 'edd-blockonomics'),
         'type'    => 'select',
@@ -692,3 +713,37 @@ function edd_blockonomics_init()
   $edd_blockonomics = new EDD_Blockonomics;
 }
 add_action( 'plugins_loaded', 'edd_blockonomics_init' );
+
+//Ajax for user checkouts through Woocommerce
+add_action( 'wp_ajax_save_uuid', 'edd_blockonomics_save_uuid' );
+add_action( 'wp_ajax_send_email', 'edd_blockonomics_refund_email' );
+//Ajax for guest checkouts through Woocommerce
+add_action( 'wp_ajax_nopriv_save_uuid', 'edd_blockonomics_alt_save_uuid' );
+add_action( 'wp_ajax_nopriv_send_email', 'edd_blockonomics_alt_refund_email' );
+function edd_blockonomics_save_uuid(){
+    $orders = edd_get_option('edd_blockonomics_orders');
+    $address = $_REQUEST['address'];
+    $uuid = $_REQUEST['uuid'];
+    $order = $orders[$address];
+    $payment = new EDD_Payment( $order['order_id'] );
+    $meta_data = $payment->get_meta();
+    $meta_data['flyp_uuid'] =  $uuid;
+    $payment->update_meta( '_edd_payment_meta', $meta_data ); 
+    wp_die();
+}
+function edd_blockonomics_refund_email(){
+    $orders = edd_get_option('edd_blockonomics_orders');
+    $order_id = $_REQUEST['order_id'];
+    $order_link = home_url().$_REQUEST['order_link'];
+    $order_coin = $_REQUEST['order_coin'];
+    $order_coin_sym = $_REQUEST['order_coin_sym'];
+    $order = $orders[$address];
+    $payment = new EDD_Payment( $order['order_id'] );
+    $payment_email = $payment->email;
+    $email = $payment_email;
+    $subject = $order_coin . ' ' . __('Refund', 'blockonomics-bitcoin-payments');
+    $message = __('Your order couldn\'t be processed as you paid less than expected.<br>The amount you paid will be refunded.<br>Visit the link below to enter your refund address.<br>', 'blockonomics-bitcoin-payments').'<a href="'.$order_link.'">'.$order_link.'</a>';
+    $emails = new EDD_Emails();
+    $emails->send( $email, $subject, $message );
+    wp_die();
+}
