@@ -65,8 +65,8 @@ class EDD_Blockonomics
     add_action( 'wp_ajax_save_uuid', array($this, 'save_uuid') );
     add_action( 'wp_ajax_send_email', array($this, 'refund_email') );
     //Ajax for guest checkouts through Woocommerce
-    add_action( 'wp_ajax_nopriv_save_uuid', 'edd_blockonomics_alt_save_uuid' );
-    add_action( 'wp_ajax_nopriv_send_email', 'edd_blockonomics_alt_refund_email' );
+    add_action( 'wp_ajax_nopriv_save_uuid', array($this, 'save_uuid') );
+    add_action( 'wp_ajax_nopriv_send_email', array($this, 'refund_email') );
 
     add_filter( 'edd_payment_gateways',         array( $this, 'register_gateway' ) );
     add_filter( 'edd_currencies',               array( $this, 'currencies' ) );
@@ -451,13 +451,13 @@ class EDD_Blockonomics
     $uuid = sanitize_text_field($_REQUEST["uuid"]);
     if ($address)
     {
-      $this->edd_blockonomics_enqueue_stylesheets();
-      $this->edd_blockonomics_enqueue_scripts();
+      $this->enqueue_stylesheets();
+      $this->enqueue_scripts();
       include plugin_dir_path(__FILE__)."order.php";
       exit();
     }else if ($uuid){
-        $this->edd_blockonomics_enqueue_stylesheets();
-        $this->edd_blockonomics_enqueue_scripts();
+        $this->enqueue_stylesheets();
+        $this->enqueue_scripts();
         include plugin_dir_path(__FILE__)."track.php";
         exit();
     }
@@ -739,13 +739,13 @@ class EDD_Blockonomics
       wp_die();
   }
 
-  public function edd_blockonomics_enqueue_stylesheets(){
+  public function enqueue_stylesheets(){
       wp_enqueue_style('bnomics-style', plugin_dir_url(__FILE__) . "css/order.css");
       wp_enqueue_style( 'bnomics-altcoins', plugin_dir_url(__FILE__) . "css/cryptofont/cryptofont.min.css");
       wp_enqueue_style( 'bnomics-icons', plugin_dir_url(__FILE__) . "css/icons/icons.css");
   }
 
-  public function edd_blockonomics_enqueue_scripts(){
+  public function enqueue_scripts(){
       wp_enqueue_script( 'angular', plugins_url('js/angular.min.js', __FILE__), array('jquery') );
       wp_enqueue_script( 'angular-resource', plugins_url('js/angular-resource.min.js', __FILE__), array('jquery') );
       wp_enqueue_script( 'app', plugins_url('js/app.js', __FILE__), array('jquery') );
