@@ -61,6 +61,12 @@ class EDD_Blockonomics
     //  add_action( 'parse_query',                  array( $this, 'strip_order_arg' ) );
     add_action( 'edd_blockonomics_cc_form',         '__return_false' );
     add_action( 'admin_notices',        array($this, 'edd_admin_messages') );
+    //Ajax for user checkouts through Woocommerce
+    add_action( 'wp_ajax_save_uuid', array($this, 'save_uuid') );
+    add_action( 'wp_ajax_send_email', array($this, 'refund_email') );
+    //Ajax for guest checkouts through Woocommerce
+    add_action( 'wp_ajax_nopriv_save_uuid', 'edd_blockonomics_alt_save_uuid' );
+    add_action( 'wp_ajax_nopriv_send_email', 'edd_blockonomics_alt_refund_email' );
 
     add_filter( 'edd_payment_gateways',         array( $this, 'register_gateway' ) );
     add_filter( 'edd_currencies',               array( $this, 'currencies' ) );
@@ -445,9 +451,13 @@ class EDD_Blockonomics
     $uuid = sanitize_text_field($_REQUEST["uuid"]);
     if ($address)
     {
+      $this->edd_blockonomics_enqueue_stylesheets();
+      $this->edd_blockonomics_enqueue_scripts();
       include plugin_dir_path(__FILE__)."order.php";
       exit();
     }else if ($uuid){
+        $this->edd_blockonomics_enqueue_stylesheets();
+        $this->edd_blockonomics_enqueue_scripts();
         include plugin_dir_path(__FILE__)."track.php";
         exit();
     }
@@ -700,6 +710,52 @@ class EDD_Blockonomics
     $settings['blockonomics'] = $blockonomics_settings;
     return $settings;
   }
+
+  public function save_uuid(){
+      $orders = edd_get_option('edd_blockonomics_orders');
+      $address = $_REQUEST['address'];
+      $uuid = $_REQUEST['uuid'];
+      $order = $orders[$address];
+      $payment = new EDD_Payment( $order['order_id'] );
+      $meta_data = $payment->get_meta();
+      $meta_data['flyp_uuid'] =  $uuid;
+      $payment->update_meta( '_edd_payment_meta', $meta_data ); 
+      wp_die();
+  }
+  public function refund_email(){
+      $orders = edd_get_option('edd_blockonomics_orders');
+      $order_id = $_REQUEST['order_id'];
+      $order_link = home_url().$_REQUEST['order_link'];
+      $order_coin = $_REQUEST['order_coin'];
+      $order_coin_sym = $_REQUEST['order_coin_sym'];
+      $order = $orders[$address];
+      $payment = new EDD_Payment( $order['order_id'] );
+      $payment_email = $payment->email;
+      $email = $payment_email;
+      $subject = $order_coin . ' ' . __('Refund', 'blockonomics-bitcoin-payments');
+      $message = __('Your order couldn\'t be processed as you paid less than expected.<br>The amount you paid will be refunded.<br>Visit the link below to enter your refund address.<br>', 'blockonomics-bitcoin-payments').'<a href="'.$order_link.'">'.$order_link.'</a>';
+      $emails = new EDD_Emails();
+      $emails->send( $email, $subject, $message );
+      wp_die();
+  }
+
+  public function edd_blockonomics_enqueue_stylesheets(){
+      wp_enqueue_style('bnomics-style', plugin_dir_url(__FILE__) . "css/order.css");
+      wp_enqueue_style( 'bnomics-altcoins', plugin_dir_url(__FILE__) . "css/cryptofont/cryptofont.min.css");
+      wp_enqueue_style( 'bnomics-icons', plugin_dir_url(__FILE__) . "css/icons/icons.css");
+  }
+
+  public function edd_blockonomics_enqueue_scripts(){
+      wp_enqueue_script( 'angular', plugins_url('js/angular.min.js', __FILE__), array('jquery') );
+      wp_enqueue_script( 'angular-resource', plugins_url('js/angular-resource.min.js', __FILE__), array('jquery') );
+      wp_enqueue_script( 'app', plugins_url('js/app.js', __FILE__), array('jquery') );
+                        wp_localize_script( 'app', 'my_ajax_object',
+                            array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+      wp_enqueue_script( 'angular-qrcode', plugins_url('js/angular-qrcode.js', __FILE__), array('jquery') );
+      wp_enqueue_script( 'vendors', plugins_url('js/vendors.min.js', __FILE__), array('jquery') );
+      wp_enqueue_script( 'reconnecting-websocket', plugins_url('js/reconnecting-websocket.min.js', __FILE__), array('jquery') );
+  }
+
 }
 
 /*Call back method for the setting 'testsetup'*/
@@ -714,36 +770,3 @@ function edd_blockonomics_init()
 }
 add_action( 'plugins_loaded', 'edd_blockonomics_init' );
 
-//Ajax for user checkouts through Woocommerce
-add_action( 'wp_ajax_save_uuid', 'edd_blockonomics_save_uuid' );
-add_action( 'wp_ajax_send_email', 'edd_blockonomics_refund_email' );
-//Ajax for guest checkouts through Woocommerce
-add_action( 'wp_ajax_nopriv_save_uuid', 'edd_blockonomics_alt_save_uuid' );
-add_action( 'wp_ajax_nopriv_send_email', 'edd_blockonomics_alt_refund_email' );
-function edd_blockonomics_save_uuid(){
-    $orders = edd_get_option('edd_blockonomics_orders');
-    $address = $_REQUEST['address'];
-    $uuid = $_REQUEST['uuid'];
-    $order = $orders[$address];
-    $payment = new EDD_Payment( $order['order_id'] );
-    $meta_data = $payment->get_meta();
-    $meta_data['flyp_uuid'] =  $uuid;
-    $payment->update_meta( '_edd_payment_meta', $meta_data ); 
-    wp_die();
-}
-function edd_blockonomics_refund_email(){
-    $orders = edd_get_option('edd_blockonomics_orders');
-    $order_id = $_REQUEST['order_id'];
-    $order_link = home_url().$_REQUEST['order_link'];
-    $order_coin = $_REQUEST['order_coin'];
-    $order_coin_sym = $_REQUEST['order_coin_sym'];
-    $order = $orders[$address];
-    $payment = new EDD_Payment( $order['order_id'] );
-    $payment_email = $payment->email;
-    $email = $payment_email;
-    $subject = $order_coin . ' ' . __('Refund', 'blockonomics-bitcoin-payments');
-    $message = __('Your order couldn\'t be processed as you paid less than expected.<br>The amount you paid will be refunded.<br>Visit the link below to enter your refund address.<br>', 'blockonomics-bitcoin-payments').'<a href="'.$order_link.'">'.$order_link.'</a>';
-    $emails = new EDD_Emails();
-    $emails->send( $email, $subject, $message );
-    wp_die();
-}
