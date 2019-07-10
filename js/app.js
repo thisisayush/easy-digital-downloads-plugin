@@ -163,7 +163,6 @@ app.controller('CheckoutController', function($scope, $interval, Order, $httpPar
             "get_order": $scope.address
         }, function(data) {
             $scope.order = data;
-            console.log(data);
             $scope.order.address = $scope.address;
             $scope.order.altcoin = $scope.altcoin;
             //Check the status of the order
