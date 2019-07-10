@@ -57,8 +57,6 @@ class EDD_Blockonomics
     add_action( 'init',                         array( $this, 'textdomain' ) );
     add_action( 'edd_gateway_blockonomics',         array( $this, 'process_payment' ) );
     add_action( 'init',                         array( $this, 'listener' ) );
-    //  add_action( 'template_redirect',            array( $this, 'process_failed_payment' ) );
-    //  add_action( 'parse_query',                  array( $this, 'strip_order_arg' ) );
     add_action( 'edd_blockonomics_cc_form',         '__return_false' );
     add_action( 'admin_notices',        array($this, 'edd_admin_messages') );
     //Ajax for user checkouts through Woocommerce
