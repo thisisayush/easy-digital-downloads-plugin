@@ -618,13 +618,13 @@ class EDD_Blockonomics
         {
           /* create notice div */
           var div = document.createElement( "div" );
-          div.classList.add( "error", "settings-warning", "notice", "is-dismissible" );
+          div.classList.add( "update-nag", "settings-warning", "notice", "is-dismissible" );
           div.setAttribute( "id", "setting-error-edd_blockonomics_confirmations" );
 
           /* create paragraph element to hold message */
           var p = document.createElement( "p" );
 
-          p.innerHTML = "<b>'.__('Blockonomics recommends 2 confirmations, to ensure the payment has arrived in your wallet.', 'edd-blockonomics').'</b>";
+          p.innerHTML = "<b>'.__('2 network confirmations recommended', 'edd-blockonomics').'</b>";
           div.appendChild( p );
 
           /* Create Dismiss icon */
