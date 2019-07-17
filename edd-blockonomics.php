@@ -493,7 +493,8 @@ class EDD_Blockonomics
           $existing_status = $order['status'];
           $timestamp = $order['timestamp'];
           $time_period = edd_get_option("edd_blockonomics_timeperiod", 10) *60;
-          $edd_status = edd_get_payment_status( $order_id, true );
+          $payment = new EDD_Payment( $order_id );
+          $meta_data = $payment->get_meta();
           $network_confirmations = edd_get_option("edd_blockonomics_confirmations", 2);
           if($network_confirmations == 'zero'){
             $network_confirmations = 0;
@@ -503,11 +504,9 @@ class EDD_Blockonomics
             $minutes = (time() - $timestamp)/60;
             edd_record_gateway_error(__("Warning: Payment arrived after $minutes minutes. Received BTC may not match current bitcoin price", 'edd-blockonomics'));
           }
-          elseif ($status >= $network_confirmations && strtolower( $edd_status ) != 'publish' && strtolower( $edd_status ) != 'failed')
+          elseif ($status >= $network_confirmations && !isset($meta_data['paid_btc_amount']))
           {
-            $payment = new EDD_Payment( $order_id );
             $value = intval(sanitize_key($_REQUEST['value']));
-            $meta_data = $payment->get_meta();
             $meta_data['paid_btc_amount'] = $value/1.0e8;
             $payment->update_meta( '_edd_payment_meta', $meta_data ); 
       
