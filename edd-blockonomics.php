@@ -611,48 +611,6 @@ class EDD_Blockonomics
                       .__('<p>Click on <b>Get Started for Free</b> on <a href=\'https://www.blockonomics.co/merchants\' target=\'_blank\'>Blockonomics Merchants</a>. Complete the Wizard, Copy the API Key when shown here</p>', 'edd-blockonomics').'");
       }
 
-      var network_confirmations = $("select[name=\'edd_settings[edd_blockonomics_confirmations]\']").find(":selected").text();
-      if(network_confirmations < 2)
-      {
-        if($("#setting-error-edd_blockonomics_confirmations").length == 0) 
-        {
-          /* create notice div */
-          var div = document.createElement( "div" );
-          div.classList.add( "update-nag", "settings-warning", "notice", "is-dismissible" );
-          div.setAttribute( "id", "setting-error-edd_blockonomics_confirmations" );
-
-          /* create paragraph element to hold message */
-          var p = document.createElement( "p" );
-
-          p.innerHTML = "<b>'.__('2 network confirmations recommended', 'edd-blockonomics').'</b>";
-          div.appendChild( p );
-
-          /* Create Dismiss icon */
-          var b = document.createElement( "button" );
-          b.setAttribute( "type", "button" );
-          b.classList.add( "notice-dismiss" );
-
-          /* Add screen reader text to Dismiss icon */
-          var bSpan = document.createElement( "span" );
-          bSpan.classList.add( "screen-reader-text" );
-          bSpan.appendChild( document.createTextNode( "Dismiss this notice." ) );
-          b.appendChild( bSpan );
-
-          /* Add Dismiss icon to notice */
-          div.appendChild( b );
-
-          /* Insert notice after the first h2 */
-          var h2 = document.getElementsByTagName( "h2" )[0];
-          h2.parentNode.insertBefore( div, h2.nextSibling);
-
-          /* Make the notice dismissable when the Dismiss icon is clicked */
-          b.addEventListener( "click", function () 
-          {
-            div.parentNode.removeChild( div );
-          });
-        }
-      }
-
       var testSetupFunc = function() 
       {
         var current_api_key = $("input[name=\'edd_settings[edd_blockonomics_api_key]\']").attr(\'value\');
@@ -747,7 +705,7 @@ class EDD_Blockonomics
         'name'    => __('Network Confirmations required for payment to complete', 'edd-blockonomics'),
         'type'    => 'select',
         'options' => array(
-          '2' => '2',
+          '2' => '2 (recommended)',
           '1' => '1',
           'zero' => '0'
         )       
