@@ -2,7 +2,7 @@
 **Tags:** bitcoin, accept bitcoin, easy digital downloads, edd, bitcoin payments 
 **Requires at least:** 3.0.1 
 **Tested up to:** 5.2 
-**Stable tag:** 1.2
+**Stable tag:** 1.3
 **License:** MIT 
 **License URI:** http://opensource.org/licenses/MIT 
 
@@ -45,3 +45,4 @@ Blockonomics Settings
 
 ![](assets-wp-repo/screenshot-2.png) 
 Invoice
+
