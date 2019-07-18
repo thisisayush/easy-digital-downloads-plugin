@@ -1,5 +1,10 @@
 == Changelog ==
 
+= 1.2  =
+* Added Altcoin Support
+* Payment screen UI improvements
+* Support to accept zero/one confirmations
+
 = 1.1  =
 * Updated README with screenshots
 
