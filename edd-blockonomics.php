@@ -493,17 +493,20 @@ class EDD_Blockonomics
           $existing_status = $order['status'];
           $timestamp = $order['timestamp'];
           $time_period = edd_get_option("edd_blockonomics_timeperiod", 10) *60;
-
+          $payment = new EDD_Payment( $order_id );
+          $meta_data = $payment->get_meta();
+          $network_confirmations = edd_get_option("edd_blockonomics_confirmations", 2);
+          if($network_confirmations == 'zero'){
+            $network_confirmations = 0;
+          }
           if ($status == 0 && time() > $timestamp + $time_period)
           {
             $minutes = (time() - $timestamp)/60;
             edd_record_gateway_error(__("Warning: Payment arrived after $minutes minutes. Received BTC may not match current bitcoin price", 'edd-blockonomics'));
           }
-          elseif ($status == 2)
+          elseif ($status >= $network_confirmations && !isset($meta_data['paid_btc_amount']))
           {
-            $payment = new EDD_Payment( $order_id );
             $value = intval(sanitize_key($_REQUEST['value']));
-            $meta_data = $payment->get_meta();
             $meta_data['paid_btc_amount'] = $value/1.0e8;
             $payment->update_meta( '_edd_payment_meta', $meta_data ); 
       
@@ -695,6 +698,16 @@ class EDD_Blockonomics
           '25' => '25',
           '30' => '30'
         )
+      ),
+      array(
+        'id'      => 'edd_blockonomics_confirmations',
+        'name'    => __('Network Confirmations required for payment to complete', 'edd-blockonomics'),
+        'type'    => 'select',
+        'options' => array(
+          '2' => '2 (recommended)',
+          '1' => '1',
+          'zero' => '0'
+        )       
       ),
       array(
         'id'      => 'edd_blockonomics_testsetup',
