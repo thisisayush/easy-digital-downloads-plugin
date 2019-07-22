@@ -151,8 +151,8 @@ class EDD_Blockonomics
   
   public function edd_admin_messages() 
   {
-    $edd_action = sanitize_key($_GET['edd-action']);
-    $settings_updated = sanitize_key($_GET['settings-updated']);
+    $edd_action = sanitize_key(isset($_GET['edd-action']) ? $_GET['edd-action'] : '');
+    $settings_updated = sanitize_key(isset($_GET['settings-updated']) ? $_GET['settings-updated'] : '');
 
     if ( $edd_action == 'testsetup' && empty($settings_updated) )
     {
@@ -424,7 +424,7 @@ class EDD_Blockonomics
 
   public function listener()
   {
-    $listener = sanitize_key($_GET['edd-listener']);
+    $listener = sanitize_key(isset($_GET['edd-listener']) ? $_GET['edd-listener'] : '');
     if( $listener != 'blockonomics' )
     {
       return;
