@@ -430,7 +430,7 @@ class EDD_Blockonomics
       return;
     }
 
-    $action = sanitize_key($_REQUEST["action"]);
+    $action = sanitize_key(isset($_REQUEST['action']) ? $_REQUEST['action'] : '');
     if( !empty($action) )
     {
       $settings_page = admin_url( 'edit.php?post_type=download&page=edd-settings&tab=gateways&section=blockonomics');
@@ -445,8 +445,8 @@ class EDD_Blockonomics
     }
 
     $orders = edd_get_option('edd_blockonomics_orders');
-    $address = sanitize_text_field($_REQUEST["show_order"]);
-    $uuid = sanitize_text_field($_REQUEST["uuid"]);
+    $address = sanitize_key(isset($_REQUEST['show_order']) ? $_REQUEST['show_order'] : '');
+    $uuid = sanitize_key(isset($_REQUEST['uuid']) ? $_REQUEST['uuid'] : '');
     if ($address)
     {
       $this->enqueue_stylesheets();
@@ -460,7 +460,7 @@ class EDD_Blockonomics
         exit();
     }
 
-    $address = sanitize_text_field($_REQUEST["finish_order"]);
+    $address = sanitize_key(isset($_REQUEST['finish_order']) ? $_REQUEST['finish_order'] : '');
     if ($address)
     {
       $order = $orders[$address];
@@ -468,7 +468,7 @@ class EDD_Blockonomics
       exit;
     }
 
-    $address = sanitize_text_field($_REQUEST['get_order']);
+    $address = sanitize_key(isset($_REQUEST['get_order']) ? $_REQUEST['get_order'] : '');
 
     if ($address)
     {
@@ -479,17 +479,17 @@ class EDD_Blockonomics
     try
     {
       $callback_secret = edd_get_option("edd_blockonomics_callback_secret");
-      $secret = sanitize_text_field($_REQUEST['secret']);
+      $secret = sanitize_key(isset($_REQUEST['secret']) ? $_REQUEST['secret'] : '');
 
       if ($callback_secret  && $callback_secret == $secret)
       {
-        $addr = sanitize_text_field($_REQUEST['addr']);
+        $addr = sanitize_key(isset($_REQUEST['addr']) ? $_REQUEST['addr'] : '');
         $order = $orders[$addr];
         $order_id = $order['order_id'];
 
         if ($order_id)
         {
-          $status = intval(sanitize_key($_REQUEST['status']));
+          $status = intval(sanitize_key(isset($_REQUEST['status']) ? $_REQUEST['status'] : ''));
           $existing_status = $order['status'];
           $timestamp = $order['timestamp'];
           $time_period = edd_get_option("edd_blockonomics_timeperiod", 10) *60;
@@ -506,7 +506,7 @@ class EDD_Blockonomics
           }
           elseif ($status >= $network_confirmations && !isset($meta_data['paid_btc_amount']))
           {
-            $value = intval(sanitize_key($_REQUEST['value']));
+            $value = intval(sanitize_key(isset($_REQUEST['value']) ? $_REQUEST['value'] : ''));
             $meta_data['paid_btc_amount'] = $value/1.0e8;
             $payment->update_meta( '_edd_payment_meta', $meta_data ); 
       
@@ -528,7 +528,7 @@ class EDD_Blockonomics
             }
           }
 
-          $order['txid'] =  sanitize_key($_REQUEST['txid']);
+          $order['txid'] =  sanitize_key(isset($_REQUEST['txid']) ? $_REQUEST['txid'] : '');
           $order['status'] = $status;
           $orders[$addr] = $order;
       
