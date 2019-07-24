@@ -445,7 +445,7 @@ class EDD_Blockonomics
     }
 
     $orders = edd_get_option('edd_blockonomics_orders');
-    $address = sanitize_key(isset($_REQUEST['show_order']) ? $_REQUEST['show_order'] : '');
+    $address = isset($_REQUEST['show_order']) ? $_REQUEST['show_order'] : '';
     $uuid = sanitize_key(isset($_REQUEST['uuid']) ? $_REQUEST['uuid'] : '');
     if ($address)
     {
@@ -460,7 +460,7 @@ class EDD_Blockonomics
         exit();
     }
 
-    $address = sanitize_key(isset($_REQUEST['finish_order']) ? $_REQUEST['finish_order'] : '');
+    $address = isset($_REQUEST['finish_order']) ? $_REQUEST['finish_order'] : '';
     if ($address)
     {
       $order = $orders[$address];
@@ -468,7 +468,7 @@ class EDD_Blockonomics
       exit;
     }
 
-    $address = sanitize_key(isset($_REQUEST['get_order']) ? $_REQUEST['get_order'] : '');
+    $address = isset($_REQUEST['get_order']) ? $_REQUEST['get_order'] : '';
 
     if ($address)
     {
