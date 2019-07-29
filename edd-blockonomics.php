@@ -291,6 +291,7 @@ class EDD_Blockonomics
         if($responseObj->response_code != 200)
         {
           edd_record_gateway_error( __( 'Error while getting BTC Address', 'edd-blockonomics' ) );
+          $this->displayError();
           return;
         }
 
@@ -336,6 +337,13 @@ class EDD_Blockonomics
         edd_send_back_to_checkout( '?payment-mode=blockonomics' );
       }
     }
+  }
+
+  private function displayError(){
+    $unable_to_generate = __('<h1>Unable to generate bitcoin address</h1><p> Note for site webmaster: ', 'blockonomics-bitcoin-payments');
+    $error_msg = 'Please login to your admin panel, navigate to Downloads > Settings > Payment Gateways [ Blockonomics ] and click <i>Test Setup</i> to diagnose the issue</p>';
+    $error_message = $unable_to_generate . $error_msg;
+    echo $error_message;
   }
 
   function update_callback_url($callback_url, $xPub, $blockonomics)
