@@ -340,7 +340,7 @@ class EDD_Blockonomics
   }
 
   private function displayError(){
-    $unable_to_generate = __('<h1>Unable to generate bitcoin address</h1><p> Note for site webmaster: ', 'blockonomics-bitcoin-payments');
+    $unable_to_generate = __('<h1>Unable to generate bitcoin address</h1><p> Note for site webmaster: ', 'edd-blockonomics');
     $error_msg = 'Please login to your admin panel, navigate to Downloads > Settings > Payment Gateways [ Blockonomics ] and click <i>Test Setup</i> to diagnose the issue</p>';
     $error_message = $unable_to_generate . $error_msg;
     echo $error_message;
