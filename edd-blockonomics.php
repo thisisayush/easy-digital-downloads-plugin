@@ -152,9 +152,10 @@ class EDD_Blockonomics
   public function edd_admin_messages() 
   {
     $edd_action = sanitize_key(isset($_GET['edd-action']) ? $_GET['edd-action'] : '');
+    $edd_section = sanitize_key(isset($_GET['section']) ? $_GET['section'] : '');
     $settings_updated = sanitize_key(isset($_GET['settings-updated']) ? $_GET['settings-updated'] : '');
 
-    if ( $edd_action == 'testsetup' && empty($settings_updated) )
+    if ( $edd_action == 'testsetup' && empty($settings_updated) && $edd_section == 'blockonomics' )
     {
       $setup_errors = $this->testSetup();
 
