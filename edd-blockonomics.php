@@ -58,7 +58,7 @@ class EDD_Blockonomics
     add_action( 'edd_gateway_blockonomics',         array( $this, 'process_payment' ) );
     add_action( 'init',                         array( $this, 'listener' ) );
     add_action( 'edd_blockonomics_cc_form',         '__return_false' );
-    add_action( 'admin_notices',        array($this, 'edd_admin_messages') );
+    add_action( 'wp_ajax_testsetup', array( $this,'edd_blockonomics_testsetup') );
     //Ajax for user checkouts through Woocommerce
     add_action( 'wp_ajax_save_uuid', array($this, 'save_uuid') );
     add_action( 'wp_ajax_send_email', array($this, 'refund_email') );
@@ -149,32 +149,22 @@ class EDD_Blockonomics
     }
   }
   
-  public function edd_admin_messages() 
-  {
-    $edd_action = sanitize_key(isset($_GET['edd-action']) ? $_GET['edd-action'] : '');
-    $edd_section = sanitize_key(isset($_GET['section']) ? $_GET['section'] : '');
-    $settings_updated = sanitize_key(isset($_GET['settings-updated']) ? $_GET['settings-updated'] : '');
-
-    if ( $edd_action == 'testsetup' && empty($settings_updated) && $edd_section == 'blockonomics' )
-    {
+  public function edd_blockonomics_testsetup(){
       $setup_errors = $this->testSetup();
-
       if($setup_errors)
       {
-        $message = $setup_errors;
-        $type = 'error';
-        add_settings_error( 'edd-blockonomics-notices', 'edd_blockonomics_setup_failed', $message , $type);
+        $return->type = 'error';
+        $return->message = $setup_errors;
+        echo json_encode($return);
       }
       else
       {
-        $message = __('Congrats ! Setup is all done', 'edd-blockonomics');
-        $type = 'updated';
-        add_settings_error( 'edd-blockonomics-notices', 'edd_blockonomics_setup_success', $message , $type);
+        $return->type = 'updated';
+        $return->message = __('Congrats ! Setup is all done', 'edd-blockonomics');
+        echo json_encode($return);
       }
-    }
-
-    settings_errors( 'edd-blockonomics-notices' );
-  } 
+      wp_die();
+  }
 
   public function textdomain()
   {
@@ -356,7 +346,7 @@ class EDD_Blockonomics
     );
   }
 
-  function testSetup()
+  private function testSetup()
   { 
     $api_key = edd_get_option('edd_blockonomics_api_key');
     $blockonomics = new BlockonomicsAPI;
@@ -603,7 +593,6 @@ class EDD_Blockonomics
       id="generate-callback" style="font:400 20px/1 dashicons;margin-left: 7px; top: 4px;position:relative;text-decoration: none;" title="Generate New Callback URL">&#xf463;<a>';
 
     //$settings_page_testsetup = add_query_arg(array( 'edd-listener' => 'blockonomics', 'action' => 'test_setup') ,home_url());
-    $settings_page_testsetup = admin_url( 'edit.php?post_type=download&page=edd-settings&tab=gateways&section=blockonomics&edd-action=testsetup');
     $settings_page = admin_url( 'edit.php?post_type=download&page=edd-settings&tab=gateways&section=blockonomics');
     $test_setup = '<p><b><i>'.__('Use below button to test the configuration.', 'edd-blockonomics').'</i></b></p>
       <p> <a id="edd-blockonomics-test-setup"  href="javascript:testSetupFunc();" class="button button-small" style="max-width:90px;">Test Setup</a> </p>
@@ -673,7 +662,50 @@ class EDD_Blockonomics
         }
         else 
         {
-          window.location = "'.$settings_page_testsetup.'";
+          $.ajax({
+                   type: \'POST\',
+                   url: "'. admin_url('admin-ajax.php') .'",
+                   data: {action: "testsetup"},
+                   success: function(data) 
+                   {   
+                      response = JSON.parse(data);
+                      /* create notice div */
+                      var div = document.createElement( "div" );
+                      div.classList.add( response.type, "settings-warning", "notice", "is-dismissible" );
+                      div.setAttribute( "id", "setting-error-edd_blockonomics_api_key_changed" );
+
+                      /* create paragraph element to hold message */
+                      var p = document.createElement( "p" );
+
+                      /* Add message text */
+                      p.innerHTML = "<b>"+response.message+"</b>";
+                      div.appendChild( p );
+
+                      /* Create Dismiss icon */
+                      var b = document.createElement( "button" );
+                      b.setAttribute( "type", "button" );
+                      b.classList.add( "notice-dismiss" );
+
+                      /* Add screen reader text to Dismiss icon */
+                      var bSpan = document.createElement( "span" );
+                      bSpan.classList.add( "screen-reader-text" );
+                      bSpan.appendChild( document.createTextNode( "Dismiss this notice." ) );
+                      b.appendChild( bSpan );
+
+                      /* Add Dismiss icon to notice */
+                      div.appendChild( b );
+
+                      /* Insert notice after the first h2 */
+                      var h2 = document.getElementsByTagName( "h2" )[0];
+                      h2.parentNode.insertBefore( div, h2.nextSibling);
+
+                      /* Make the notice dismissable when the Dismiss icon is clicked */
+                      b.addEventListener( "click", function () 
+                      {
+                        div.parentNode.removeChild( div );
+                      });
+                   }
+                 });
         }
       };
 </script>
