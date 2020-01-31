@@ -1,5 +1,8 @@
 == Changelog ==
 
+= 1.3.2  =
+* Moved location of test setup messages
+
 = 1.3.1  =
 * Fixed debug errors
 * Sorted minor UI issues
