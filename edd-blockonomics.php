@@ -2,7 +2,7 @@
 /**
  * Plugin Name: EDD - Blockonomics
  * Description: Accept Bitcoin Payments on your Easy Digital Downloads powered website with Blockonomics
- * Version: 1.3.1
+ * Version: 1.3.2
  * Author: Blockonomics
  * Author URI: https://www.blockonomics.co
  * License: MIT
@@ -596,7 +596,7 @@ class EDD_Blockonomics
 
     //$settings_page_testsetup = add_query_arg(array( 'edd-listener' => 'blockonomics', 'action' => 'test_setup') ,home_url());
     $settings_page = admin_url( 'edit.php?post_type=download&page=edd-settings&tab=gateways&section=blockonomics');
-    $test_setup = '<p><b><i>'.__('Use below button to test the configuration.', 'edd-blockonomics').'</i></b></p>
+    $test_setup = '<p id="testsetup_msg"><b><i>'.__('Use below button to test the configuration.', 'edd-blockonomics').'</i></b></p>
       <p> <a id="edd-blockonomics-test-setup"  href="javascript:testSetupFunc();" class="button button-small" style="max-width:90px;">Test Setup</a> </p>
 
       <script type="text/javascript">
@@ -651,9 +651,9 @@ class EDD_Blockonomics
             /* Add Dismiss icon to notice */
             div.appendChild( b );
 
-            /* Insert notice after the first h2 */
-            var h2 = document.getElementsByTagName( "h2" )[0];
-            h2.parentNode.insertBefore( div, h2.nextSibling);
+            /* Insert notice in test msg div */
+            var test_msg = document.getElementById( "testsetup_msg" );
+            test_msg.appendChild(div);
 
             /* Make the notice dismissable when the Dismiss icon is clicked */
             b.addEventListener( "click", function () 
@@ -697,9 +697,9 @@ class EDD_Blockonomics
                       /* Add Dismiss icon to notice */
                       div.appendChild( b );
 
-                      /* Insert notice after the first h2 */
-                      var h2 = document.getElementsByTagName( "h2" )[0];
-                      h2.parentNode.insertBefore( div, h2.nextSibling);
+                      /* Insert notice in test msg div */
+                      var test_msg = document.getElementById( "testsetup_msg" );
+                      test_msg.appendChild(div);
 
                       /* Make the notice dismissable when the Dismiss icon is clicked */
                       b.addEventListener( "click", function () 
