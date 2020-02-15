@@ -277,7 +277,11 @@ class EDD_Blockonomics
         $callback_secret = trim(edd_get_option('edd_blockonomics_callback_secret', ''));
         $blockonomics = new BlockonomicsAPI;
         $responseObj = $blockonomics->new_address($api_key, $callback_secret);
-        $price = $blockonomics->get_price(edd_get_currency());
+        $currency = edd_get_currency();
+        if($currency == 'RIAL'){
+          $currency = 'IRR';
+        }
+        $price = $blockonomics->get_price($currency);
 
         if($responseObj->response_code != 200)
         {
@@ -292,7 +296,7 @@ class EDD_Blockonomics
         $order = array(
           'value'              => $purchase_data['price'],
           'satoshi'            => intval(1.0e8*$purchase_data['price']/$price),
-          'currency'           => edd_get_currency(),
+          'currency'           => $currency,
           'order_id'            => $payment_id,
           'status'             => -1,
           'timestamp'          => time(),
