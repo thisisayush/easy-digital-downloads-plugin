@@ -281,7 +281,11 @@ class EDD_Blockonomics
         if($currency == 'RIAL'){
           $currency = 'IRR';
         }
-        $price = $blockonomics->get_price($currency);
+        if($currency != 'BTC'){
+          $price = $blockonomics->get_price($currency);
+        }else{
+          $price = 1;
+        }
 
         if($responseObj->response_code != 200)
         {
