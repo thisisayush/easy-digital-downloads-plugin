@@ -1,5 +1,8 @@
 == Changelog ==
 
+= 1.3.3  =
+* Fixed issues with RIAL and BTC currencies
+
 = 1.3.2  =
 * Moved location of test setup messages
 
