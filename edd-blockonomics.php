@@ -2,7 +2,7 @@
 /**
  * Plugin Name: EDD - Blockonomics
  * Description: Accept Bitcoin Payments on your Easy Digital Downloads powered website with Blockonomics
- * Version: 1.3.3
+ * Version: 1.3.4
  * Author: Blockonomics
  * Author URI: https://www.blockonomics.co
  * License: MIT
@@ -54,7 +54,6 @@ class EDD_Blockonomics
     $this->includes();
     $this->generate_secret_and_callback();
 
-    add_action( 'init',                         array( $this, 'textdomain' ) );
     add_action( 'edd_gateway_blockonomics',         array( $this, 'process_payment' ) );
     add_action( 'init',                         array( $this, 'listener' ) );
     add_action( 'edd_blockonomics_cc_form',         '__return_false' );
@@ -164,35 +163,6 @@ class EDD_Blockonomics
         echo json_encode($return);
       }
       wp_die();
-  }
-
-  public function textdomain()
-  {
-    // Set filter for plugin's languages directory
-    $lang_dir = dirname( plugin_basename( __FILE__ ) ) . '/languages/';
-    $lang_dir = apply_filters( 'edd_blockonomics_languages_directory', $lang_dir );
-
-    // Traditional WordPress plugin locale filter
-    $locale        = apply_filters( 'plugin_locale',  get_locale(), 'edd-blockonomics' );
-    $mofile        = sprintf( '%1$s-%2$s.mo', 'edd-blockonomics', $locale );
-
-    // Setup paths to current locale file
-    $mofile_local  = $lang_dir . $mofile;
-    $mofile_global = WP_LANG_DIR . '/edd-blockonomics/' . $mofile;
-
-    if ( file_exists( $mofile_global ) )
-    {
-      load_textdomain( 'edd-blockonomics', $mofile_global );
-    }
-    elseif( file_exists( $mofile_local ) )
-    {
-      load_textdomain( 'edd-blockonomics', $mofile_local );
-    }
-    else
-    {
-      // Load the default language files
-      load_plugin_textdomain( 'edd-blockonomics', false, $lang_dir );
-    }
   }
 
   public function register_gateway( $gateways )
