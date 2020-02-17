@@ -208,11 +208,6 @@ class EDD_Blockonomics
     global $edd_options;
 
     $api_key = trim(edd_get_option('edd_blockonomics_api_key', ''));
-    if( empty ($api_key) )
-    {
-      edd_set_error( 'edd_blockonomics_api_invalid', __( 'Please enter your Blockonomics API key and secret in Settings', 'edd-blockonomics' ) );
-      edd_send_back_to_checkout( '?payment-mode=blockonomics' );
-    }
 
     // Collect payment data
     $payment_data = array(
