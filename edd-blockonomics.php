@@ -573,23 +573,23 @@ class EDD_Blockonomics
       <p> <a id="edd-blockonomics-test-setup"  href="javascript:testSetupFunc();" class="button button-small" style="max-width:90px;">Test Setup</a> </p>
 
       <script type="text/javascript">
-      var api_key = $("input[name=\'edd_settings[edd_blockonomics_api_key]\']").attr(\'value\');
+      var api_key = jQuery("input[name=\'edd_settings[edd_blockonomics_api_key]\']").attr(\'value\');
 
       history.pushState({}, document.title, "'.$settings_page.'");
       if(api_key.length == 0)
       {
-        var setting_table = $("input[name=\'edd_settings[edd_blockonomics_api_key]\']").closest("table");
+        var setting_table = jQuery("input[name=\'edd_settings[edd_blockonomics_api_key]\']").closest("table");
         setting_table.before("'.__('<p>You are few clicks away from accepting bitcoin payments</p>', 'edd-blockonomics')
                       .__('<p>Click on <b>Get Started for Free</b> on <a href=\'https://www.blockonomics.co/merchants\' target=\'_blank\'>Blockonomics Merchants</a>. Complete the Wizard, Copy the API Key when shown here</p>', 'edd-blockonomics').'");
       }
 
       var testSetupFunc = function() 
       {
-        var current_api_key = $("input[name=\'edd_settings[edd_blockonomics_api_key]\']").attr(\'value\');
+        var current_api_key = jQuery("input[name=\'edd_settings[edd_blockonomics_api_key]\']").attr(\'value\');
         if( (current_api_key == api_key && api_key.length == 0 ) 
                 || current_api_key != api_key ) 
         { 
-          if($("#setting-error-edd_blockonomics_api_key_changed").length == 0) 
+          if(jQuery("#setting-error-edd_blockonomics_api_key_changed").length == 0) 
           {
             /* create notice div */
             var div = document.createElement( "div" );
@@ -637,7 +637,7 @@ class EDD_Blockonomics
         }
         else 
         {
-          $.ajax({
+          jQuery.ajax({
                    type: \'POST\',
                    url: "'. admin_url('admin-ajax.php') .'",
                    data: {action: "testsetup"},
