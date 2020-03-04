@@ -573,22 +573,23 @@ class EDD_Blockonomics
       <p> <a id="edd-blockonomics-test-setup"  href="javascript:testSetupFunc();" class="button button-small" style="max-width:90px;">Test Setup</a> </p>
 
       <script type="text/javascript">
-      var api_key = jQuery("input[name=\'edd_settings[edd_blockonomics_api_key]\']").attr(\'value\');
+      var api_key = document.getElementsByName("edd_settings[edd_blockonomics_api_key]")[0].getAttribute(\'value\');
 
       if(api_key.length == 0)
       {
-        var setting_table = jQuery("input[name=\'edd_settings[edd_blockonomics_api_key]\']").closest("table");
-        setting_table.before("'.__('<p>You are few clicks away from accepting bitcoin payments</p>', 'edd-blockonomics')
-                      .__('<p>Click on <b>Get Started for Free</b> on <a href=\'https://www.blockonomics.co/merchants\' target=\'_blank\'>Blockonomics Merchants</a>. Complete the Wizard, Copy the API Key when shown here</p>', 'edd-blockonomics').'");
+        var p_element = document.createElement( "p" );
+        p_element.innerHTML = "You are few clicks away from accepting bitcoin payments</p><p>Click on <b>Get Started for Free</b> on <a href=\'https://www.blockonomics.co/merchants\' target=\'_blank\'>Blockonomics Merchants</a>. Complete the Wizard, Copy the API Key when shown here";
+        var setting_table = document.getElementsByTagName("table")[0];
+        setting_table.insertBefore(p_element, setting_table.childNodes[0]);
       }
 
       var testSetupFunc = function() 
       {
-        var current_api_key = jQuery("input[name=\'edd_settings[edd_blockonomics_api_key]\']").attr(\'value\');
+        var current_api_key = document.getElementsByName("edd_settings[edd_blockonomics_api_key]")[0].value;
         if( (current_api_key == api_key && api_key.length == 0 ) 
                 || current_api_key != api_key ) 
-        { 
-          if(jQuery("#setting-error-edd_blockonomics_api_key_changed").length == 0) 
+        {
+          if(document.getElementById("setting-error-edd_blockonomics_api_key_changed") == null) 
           {
             /* create notice div */
             var div = document.createElement( "div" );
@@ -636,50 +637,48 @@ class EDD_Blockonomics
         }
         else 
         {
-          jQuery.ajax({
-                   type: \'POST\',
-                   url: "'. admin_url('admin-ajax.php') .'",
-                   data: {action: "testsetup"},
-                   success: function(data) 
-                   {   
-                      response = JSON.parse(data);
-                      /* create notice div */
-                      var div = document.createElement( "div" );
-                      div.classList.add( response.type, "settings-warning", "notice", "is-dismissible" );
-                      div.setAttribute( "id", "setting-error-edd_blockonomics_api_key_changed" );
+        	var xhr = new XMLHttpRequest();
+          xhr.open("POST", "'. admin_url('admin-ajax.php') .'", true);
+          xhr.setRequestHeader(\'Content-Type\', \'application/x-www-form-urlencoded;\');
+          xhr.send("action=testsetup");
+          xhr.onload = function() {
+          response = JSON.parse(this.response);
+          /* create notice div */
+          var div = document.createElement( "div" );
+          div.classList.add( response.type, "settings-warning", "notice", "is-dismissible" );
+          div.setAttribute( "id", "setting-error-edd_blockonomics_api_key_changed" );
 
-                      /* create paragraph element to hold message */
-                      var p = document.createElement( "p" );
+          /* create paragraph element to hold message */
+          var p = document.createElement( "p" );
 
-                      /* Add message text */
-                      p.innerHTML = "<b>"+response.message+"</b>";
-                      div.appendChild( p );
+          /* Add message text */
+          p.innerHTML = "<b>"+response.message+"</b>";
+          div.appendChild( p );
 
-                      /* Create Dismiss icon */
-                      var b = document.createElement( "button" );
-                      b.setAttribute( "type", "button" );
-                      b.classList.add( "notice-dismiss" );
+          /* Create Dismiss icon */
+          var b = document.createElement( "button" );
+          b.setAttribute( "type", "button" );
+          b.classList.add( "notice-dismiss" );
 
-                      /* Add screen reader text to Dismiss icon */
-                      var bSpan = document.createElement( "span" );
-                      bSpan.classList.add( "screen-reader-text" );
-                      bSpan.appendChild( document.createTextNode( "Dismiss this notice." ) );
-                      b.appendChild( bSpan );
+          /* Add screen reader text to Dismiss icon */
+          var bSpan = document.createElement( "span" );
+          bSpan.classList.add( "screen-reader-text" );
+          bSpan.appendChild( document.createTextNode( "Dismiss this notice." ) );
+          b.appendChild( bSpan );
 
-                      /* Add Dismiss icon to notice */
-                      div.appendChild( b );
+          /* Add Dismiss icon to notice */
+          div.appendChild( b );
 
-                      /* Insert notice in test msg div */
-                      var test_msg = document.getElementById( "testsetup_msg" );
-                      test_msg.appendChild(div);
+          /* Insert notice in test msg div */
+          var test_msg = document.getElementById( "testsetup_msg" );
+          test_msg.appendChild(div);
 
-                      /* Make the notice dismissable when the Dismiss icon is clicked */
-                      b.addEventListener( "click", function () 
-                      {
-                        div.parentNode.removeChild( div );
-                      });
-                   }
-                 });
+          /* Make the notice dismissable when the Dismiss icon is clicked */
+          b.addEventListener( "click", function () 
+          {
+            div.parentNode.removeChild( div );
+            });
+          }
         }
       };
 </script>
