@@ -575,7 +575,6 @@ class EDD_Blockonomics
       <script type="text/javascript">
       var api_key = jQuery("input[name=\'edd_settings[edd_blockonomics_api_key]\']").attr(\'value\');
 
-      history.pushState({}, document.title, "'.$settings_page.'");
       if(api_key.length == 0)
       {
         var setting_table = jQuery("input[name=\'edd_settings[edd_blockonomics_api_key]\']").closest("table");
