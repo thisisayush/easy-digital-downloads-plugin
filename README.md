@@ -2,7 +2,7 @@
 **Tags:** bitcoin, accept bitcoin, easy digital downloads, edd, bitcoin payments 
 **Requires at least:** 4.6 
 **Tested up to:** 5.3.2 
-**Stable tag:** 1.3.4
+**Stable tag:** 1.3.5
 **License:** MIT 
 **License URI:** http://opensource.org/licenses/MIT 
 
