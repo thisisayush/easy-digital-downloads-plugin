@@ -1,5 +1,8 @@
 == Changelog ==
 
+= 1.3.6  =
+* Fixed callback issues due to sanitize_key
+
 = 1.3.5  =
 * Fixed issues with test setup not working
 
