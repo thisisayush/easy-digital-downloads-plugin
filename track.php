@@ -31,7 +31,7 @@
                       </a>
                     </div>
                     <div class="bnomics-qr-code-hint">
-                      <?= __('Click on the QR code to open in the wallet', 'edd-blockonomics') ?>
+                    <a href="{{crypto.uri}}:{{order.address}}?amount={{order.satoshi/1.0e8}}" target="_blank"><?=__('Open in wallet', 'edd-blockonomics')?></a>
                     </div>
                   </div>
                 </div>
@@ -40,7 +40,7 @@
                     <!-- Payment Text -->
                     <div class="bnomics-order-status-wrapper">
                       <span class="bnomics-order-status-title" ng-show="order.altstatus == 'waiting'" ng-cloak >
-                        <?= __('To confirm your order, please send the exact amount of <strong>{{altcoinselect}}</strong> to the given address', 'edd-blockonomics') ?>
+                        <?= __('To pay, send exactly this {{altcoinselect}} amount', 'edd-blockonomics') ?>
                       </span>
                     </div>
                     <h4 class="bnomics-amount-title" for="invoice-amount">
@@ -48,12 +48,12 @@
                     </h4>
                     <!-- Altcoin Address -->
                     <div class="bnomics-address">
-                      <input ng-click="alt_address_click()" id="bnomics-alt-address-input" class="bnomics-address-input" type="text" ng-value="order.altaddress" readonly="readonly">
-                      <i ng-click="alt_address_click()" class="material-icons bnomics-copy-icon">file_copy</i>
-                    </div>
-                    <div class="bnomics-copy-text" ng-show="copyshow" ng-cloak>
-                      <?= __('Copied to clipboard', 'edd-blockonomics') ?>
-                    </div>
+                    <div class="bnomics-address-text" ng-hide="address_copyshow" ng-cloak><?=__('To this {{crypto.name | lowercase}} address', 'edd-blockonomics')?></div>
+                    <div class="bnomics-copy-address-text" ng-show="address_copyshow" ng-cloak><?=__('Copied to clipboard', 'edd-blockonomics')?></div>
+                    <ul ng-click="blockonomics_address_click()" id="bnomics-address-input" class="bnomics-address-input">
+                          <li id="bnomics-address-copy">{{order.address}}</li>
+                    </ul>
+                  </div>
                     <!-- Countdown Timer -->
                     <div ng-cloak ng-hide="order.altstatus != 'waiting'  || alt_clock <= 0" class="bnomics-progress-bar-wrapper">
                       <div class="bnomics-progress-bar-container">
@@ -61,16 +61,16 @@
                         </div>
                       </div>
                     </div>
-                    <span class="ng-cloak bnomics-time-left" ng-hide="order.altstatus != 'waiting' || alt_clock <= 0">{{alt_clock*1000 | date:'mm:ss' : 'UTC'}} min left to pay your order
-                    </span>
+                    <span class="ng-cloak bnomics-time-left" ng-hide="order.altstatus != 'waiting' || alt_clock <= 0">{{alt_clock*1000 | date:'mm:ss' : 'UTC'}} min</span>
                   </div>
                   <div class="bnomics-altcoin-cancel">
                     <a href="" ng-click="go_back()"><?= __('Click here', 'edd-blockonomics') ?></a> <?= __('to go back', 'edd-blockonomics') ?>
                   </div>
                   <!-- Blockonomics Credit -->
                   <div class="bnomics-powered-by">
-                    <?= __('Powered by ', 'edd-blockonomics') ?>Blockonomics
-                  </div>
+                  <a href="https://blog.blockonomics.co/how-to-pay-a-bitcoin-invoice-abf4a04d041c" target="_blank"><?=__('How do I pay? | Check reviews of this shop', 'blockonomics-bitcoin-payments')?></a><br>
+                  <div class="bnomics-powered-by-text bnomics-grey"><?=__('Powered by Blockonomics', 'edd-blockonomics')?></div>
+                </div>
                 </div>
               </div>
               <!-- RECEIVED -->
@@ -124,7 +124,10 @@
               </div>
             </div>
           <!-- Blockonomics Credit -->
-          <div class="bnomics-powered-by" ng-hide="order.altstatus == 'waiting'"><?= __('Powered by ', 'edd-blockonomics') ?>Blockonomics</div>
+          <div class="bnomics-powered-by">
+                  <a href="https://blog.blockonomics.co/how-to-pay-a-bitcoin-invoice-abf4a04d041c" target="_blank"><?=__('How do I pay? | Check reviews of this shop', 'blockonomics-bitcoin-payments')?></a><br>
+                  <div class="bnomics-powered-by-text bnomics-grey"><?=__('Powered by Blockonomics', 'edd-blockonomics')?></div>
+          </div>
         </div>
       </div>
     </div>
