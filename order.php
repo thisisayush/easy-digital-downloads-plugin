@@ -5,14 +5,6 @@
       <!-- Heading row -->
       <div class="bnomics-order-heading">
         <div class="bnomics-order-heading-wrapper">
-          <?php if (edd_get_option('edd_blockonomics_altcoins', 0)) : ?>
-          <div class="bnomics-payment-option" ng-hide="order.status == -3">
-            <span class="bnomics-paywith-label" ng-cloak> <?=__('Pay with', 'edd-blockonomics')?> </span>
-            <span>
-              <span class="bnomics-paywith-option bnomics-paywith-btc" ng-class={'bnomics-paywith-selected':show_altcoin=='0'} ng-click="show_altcoin=0">BTC</span><span class="bnomics-paywith-option bnomics-paywith-altcoin" ng-class={'bnomics-paywith-selected':show_altcoin=='1'} ng-click="show_altcoin=1">Altcoins</span>     
-            </span>
-          </div><br>
-          <?php endif;?>
           <div class="bnomics-order-id">
             <span class="bnomics-order-number" ng-cloak> <?=__('Order #', 'edd-blockonomics')?>{{order.order_id}}</span>
           </div>
@@ -79,27 +71,6 @@
               </div>
             </div>
           </div>
-
-          <?php if (edd_get_option('edd_blockonomics_altcoins', 0)) : ?>
-          <div class="bnomics-altcoin-pane" ng-style="{'border-left': (altcoin_waiting)?'none':''}" ng-hide="show_altcoin != 1">
-            <div class="bnomics-altcoin-bg">
-                <div class="bnomics-altcoin-bg-color" ng-hide="altcoin_waiting" ng-cloak>
-                 <div class="bnomics-altcoin-info-wrapper">
-                  <span class="bnomics-altcoin-info" ><?=__('Select your preferred <strong>Altcoin</strong> then click on the button below.', 'edd-blockonomics')?></span>
-                 </div>
-                 </br>
-                 <!-- Coin Select -->
-                 <div class="bnomics-address">
-                   <select ng-model="altcoinselect" ng-options="x for (x, y) in altcoins" ng-init="altcoinselect='Ethereum'"></select>
-                 </div>
-                 <div class="bnomics-altcoin-button-wrapper">
-                  <a ng-click="pay_altcoins()" href=""><button><i class="cf" ng-hide="altcoinselect!='Ethereum'" ng-class={'cf-eth':'{{altcoinselect}}'!=''} ></i><i class="cf" ng-hide="altcoinselect!='Litecoin'" ng-class={'cf-ltc':'{{altcoinselect}}'!=''} ></i> <?=__('Pay with', 'edd-blockonomics')?> {{altcoinselect}}</button></a>
-                 </div>
-                </div>
-            </div>
-          </div>
-          <?php endif ?>
-
         </div>
       </div>
     </div>

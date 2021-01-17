@@ -697,11 +697,6 @@ class EDD_Blockonomics
         'type'    => 'text'
       ),
       array(
-        'id'      => 'edd_blockonomics_altcoins',
-        'name'    => __('Accept Altcoin Payments (Using Flyp.me)', 'edd-blockonomics'),
-        'type'    => 'checkbox'
-      ),
-      array(
         'id'      => 'edd_blockonomics_payment_countdown_time',
         'name'    => __('Time period of countdown timer on payment page (in minutes)', 'edd-blockonomics'),
         'type'    => 'select',
