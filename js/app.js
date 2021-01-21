@@ -111,16 +111,48 @@ app.controller('CheckoutController', function($scope, $interval, Order, $httpPar
         });
     }
 
+    function select_text(divid)
+    {
+        var selection = window.getSelection();
+        var div = document.createRange();
+
+        div.setStartBefore(document.getElementById(divid));
+        div.setEndAfter(document.getElementById(divid)) ;
+        selection.removeAllRanges();
+        selection.addRange(div);
+    }
+
+    function copy_to_clipboard(divid)
+    {
+        var textarea = document.createElement('textarea');
+        textarea.id = 'temp_element';
+        textarea.style.height = 0;
+        document.body.appendChild(textarea);
+        textarea.value = document.getElementById(divid).innerText;
+        var selector = document.querySelector('#temp_element');
+        selector.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+
+        select_text(divid);
+
+        if (divid == "bnomics-address-copy") {
+            $scope.address_copyshow = true;
+            $timeout(function() {
+                $scope.address_copyshow = false;
+                //Close copy to clipboard message after 2 sec
+            }, 2000);
+        }else{
+            $scope.amount_copyshow = true;
+            $timeout(function() {
+                $scope.amount_copyshow = false;
+                //Close copy to clipboard message after 2 sec
+            }, 2000);            
+        }
+    }
+
     //Copy bitcoin address to clipboard
-    $scope.btc_address_click = function() {
-        var copyText = document.getElementById("bnomics-address-input");
-        copyText.select();
-        document.execCommand("copy");
-        //Open copy clipboard message
-        $scope.copyshow = true;
-        $timeout(function() {
-            $scope.copyshow = false;
-        //Close copy to clipboard message after 2 sec
-        }, 2000);
+    $scope.blockonomics_address_click = function() {
+        copy_to_clipboard("bnomics-address-copy");
     }
 });
