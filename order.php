@@ -19,11 +19,11 @@
               <!-- QR and Amount -->
               <div class="bnomics-qr-code" ng-hide="order.status == -3">
                 <div class="bnomics-qr">
-                          <a href="bitcoin:{{order.address}}?amount={{order.satoshi/1.0e8}}">
-                            <qrcode data="bitcoin:{{order.address}}?amount={{order.satoshi/1.0e8}}" size="160" version="6">
-                              <canvas class="qrcode"></canvas>
-                            </qrcode>
-                          </a>
+                  <a href="bitcoin:{{order.address}}?amount={{order.satoshi/1.0e8}}">
+                    <qrcode data="bitcoin:{{order.address}}?amount={{order.satoshi/1.0e8}}" size="160" version="6">
+                      <canvas class="qrcode"></canvas>
+                    </qrcode>
+                  </a>
                 </div>
                 <div class="bnomics-qr-code-hint">
                   <a href="bitcoin:{{order.address}}?amount={{order.satoshi/1.0e8}}" target="_blank"><?=__('Open in wallet', 'edd-blockonomics')?></a>
@@ -55,7 +55,7 @@
                           <li id="bnomics-address-copy">{{order.address}}</li>
                     </ul>
                   </div>
-            <!-- Countdown Timer -->
+                <!-- Countdown Timer -->
                 <div ng-cloak ng-hide="order.status != -1" class="bnomics-progress-bar-wrapper">
                   <div class="bnomics-progress-bar-container">
                     <div class="bnomics-progress-bar" style="width: {{progress}}%;"></div>
@@ -63,12 +63,12 @@
                 </div>
                 <span class="ng-cloak bnomics-time-left" ng-hide="order.status != -1">{{clock*1000 | date:'mm:ss' : 'UTC'}} min</span>
               </div>
-        <!-- Blockonomics Credit -->
-                <div class="bnomics-powered-by">
-                  <a href="https://blog.blockonomics.co/how-to-pay-a-bitcoin-invoice-abf4a04d041c" target="_blank"><?=__('How do I pay? | Check reviews of this shop', 'blockonomics-bitcoin-payments')?></a><br>
-                  <div class="bnomics-powered-by-text bnomics-grey"><?=__('Powered by Blockonomics', 'edd-blockonomics')?></div>
-                </div>
               </div>
+            </div>
+            <!-- Blockonomics Credit -->
+            <div class="bnomics-powered-by">
+              <a href="https://blog.blockonomics.co/how-to-pay-a-bitcoin-invoice-abf4a04d041c" target="_blank"><?=__('How do I pay? | Check reviews of this shop', 'blockonomics-bitcoin-payments')?></a><br>
+              <div class="bnomics-powered-by-text bnomics-grey"><?=__('Powered by Blockonomics', 'edd-blockonomics')?></div>
             </div>
           </div>
         </div>
