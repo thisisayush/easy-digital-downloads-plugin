@@ -29,8 +29,6 @@
 .bnomics-progress-bar-container {
   position: relative;
   overflow: hidden;
-  width: 90%;
-  margin-left:5%;
   height: 4px;
   background: #ddd;
 }
@@ -104,6 +102,9 @@
   word-break: break-all;
 }
 
+.bnomics-order-expired-wrapper, .bnomics-order-error-wrapper {
+  text-align: center;
+}
 
 .bnomics-spinner {
   margin: auto;
