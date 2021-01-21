@@ -34,7 +34,7 @@
               <div class="bnomics-bg">
                 <!-- Order Status -->
                 <div class="bnomics-order-status-wrapper">
-                  <span class="bnomics-order-status-title" ng-show="order.status == -1" ng-cloak ><?=__('To pay, send exactly this BTC {{altcoinselect}} amount')?></span>
+                  <span class="bnomics-order-status-title" ng-show="order.status == -1" ng-cloak ><?=__('To pay, send exactly this BTC amount')?></span>
                   <span class="warning bnomics-status-warning" ng-show="order.status == -3" ng-cloak><?=__('Payment Expired (Use the browser back button and try again)', 'edd-blockonomics')?></span>
                   <span class="warning bnomics-status-warning" ng-show="order.status == -2" ng-cloak><?=__('Payment Error', 'edd-blockonomics')?></span>
                 </div>
