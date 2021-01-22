@@ -761,8 +761,6 @@ class EDD_Blockonomics
 
   public function enqueue_stylesheets(){
       wp_enqueue_style('bnomics-style', plugin_dir_url(__FILE__) . "css/order.css");
-      wp_enqueue_style( 'bnomics-altcoins', plugin_dir_url(__FILE__) . "css/cryptofont/cryptofont.min.css");
-      wp_enqueue_style( 'bnomics-icons', plugin_dir_url(__FILE__) . "css/icons/icons.css");
   }
 
   public function enqueue_scripts(){

@@ -131,19 +131,9 @@
   text-transform: uppercase;
 }
 
-.bnomics-amount-seperator{
-  width:10%;
-  margin:0;
-  margin-left:45%
-}
-
 .bnomics-time-left {
   line-height: 3;
   font-size: 0.8em;
-}
-
-.bnomics-payment-option {
-  text-align:center;
 }
 
 .bnomics-order-id {
@@ -197,16 +187,6 @@
   font-size:1.25em;
 }
 
-.bnomics-copy-icon {
-  cursor: pointer;
-  margin: 10px 0 !important;
-  font-size: 24px !important;
-}
-
-.bnomics-copy-text{
-    padding-bottom: 15px !important;
-}
-
 .bnomics-status-flex {
   padding-top:10px;
   padding-bottom:10px;
@@ -255,9 +235,6 @@
 
   .bnomics-order-info {
     display: block;
-  }
-  .bnomics-copy-icon {
-    display:none !important;
   }
 }
 
