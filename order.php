@@ -36,19 +36,17 @@
               <div class="bnomics-amount">
               <div class="bnomics-bg">
                 <!-- Order Status -->
-                <div class="bnomics-order-status-wrapper">
-                  <span class="bnomics-order-status-title" ng-show="order.status == -1" ng-cloak ><?=__('To pay, send exactly this BTC amount')?></span>
-                  <span class="warning bnomics-status-warning" ng-show="order.status == -2" ng-cloak><?=__('Payment Error', 'edd-blockonomics')?></span>
-                </div>
-
-                  <div>
-                  <ul ng-click="blockonomics_amount_click()" id="bnomics-amount-input" class="bnomics-amount-input">
-                      <li id="bnomics-amount-copy">{{order.satoshi/1.0e8}} BTC</li>
-                      <li>{{crypto.code | uppercase}}</li>
-                      <li class="bnomics-grey"> ≈ </li>
-                      <li class="bnomics-grey">{{order.value}}</li>
-                      <li class="bnomics-grey">{{order.currency}}</li>
-                  </ul>
+                <div class="bnomics-amount">
+                    <span class="warning bnomics-status-warning" ng-show="order.status == -2" ng-cloak><?=__('Payment Error', 'edd-blockonomics')?></span>
+                    <div class="bnomics-amount-text" ng-hide="amount_copyshow" ng-cloak><?=__('To pay, send exactly this BTC amount', 'edd-blockonomics')?></div>
+                    <div class="bnomics-copy-amount-text" ng-show="amount_copyshow" ng-cloak><?=__('Copied to clipboard', 'edd-blockonomics')?></div>
+                    <ul ng-click="blockonomics_amount_click()" id="bnomics-amount-input" class="bnomics-amount-input">
+                        <li id="bnomics-amount-copy">{{order.satoshi/1.0e8}}</li>
+                        <li>BTC</li>
+                        <li class="bnomics-grey"> ≈ </li>
+                        <li class="bnomics-grey">{{order.value}}</li>
+                        <li class="bnomics-grey">{{order.currency}}</li>
+                    </ul>
                   </div>
                   <!-- Bitcoin Address -->
                   <div class="bnomics-address">

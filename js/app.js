@@ -155,4 +155,10 @@ app.controller('CheckoutController', function($scope, $interval, Order, $httpPar
     $scope.blockonomics_address_click = function() {
         copy_to_clipboard("bnomics-address-copy");
     }
+
+    //Copy bitcoin amount to clipboard
+    $scope.blockonomics_amount_click = function() {
+        copy_to_clipboard("bnomics-amount-copy");
+    }
+
 });
