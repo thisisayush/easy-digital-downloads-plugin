@@ -79,9 +79,6 @@
     <script>
     var blockonomics_time_period=<?php echo edd_get_option('edd_blockonomics_payment_countdown_time', 10); ?>;
     </script>
-    <script>
-    var get_uuid="<?php if(isset($_REQUEST['uuid'])){echo $_REQUEST['uuid'];} ?>";
-    </script>
   </div>
 </div>
 
