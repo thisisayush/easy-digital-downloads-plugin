@@ -15,16 +15,11 @@ service.factory('Order', function($resource) {
     return item;
 });
 
-service.factory('WpAjax', function($resource) {
-    var rsc = $resource(my_ajax_object.ajax_url);
-    return rsc;
-});
-
 app = angular.module("shopping-cart-demo", ["monospaced.qrcode", "shoppingcart.services"]);
 
 
 app.config(function($compileProvider) {
-    $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|data|chrome-extension|bitcoin|ethereum|litecoin):/);
+    $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|data|chrome-extension|bitcoin):/);
     // Angular before v1.2 uses $compileProvider.urlSanitizationWhitelist(...)
 });
 

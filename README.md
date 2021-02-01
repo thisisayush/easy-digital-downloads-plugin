@@ -10,7 +10,7 @@ Accept bitcoin payments and altcoins on your Easy Digital Downloads website. Bit
 
 ## Description ## 
 
-The fastest and easiest way to start accepting Bitcoin payments on your Easy Digital Downloads Store. Since 2015, [Blockonomics](https://www.blockonomics.co/merchants?utm_source=wordpress-edd) has helped thousands of ecommerce sites increase sales by including Bitcoin, Ethereum and Litecoin as payment option for their customers. 
+The fastest and easiest way to start accepting Bitcoin payments on your Easy Digital Downloads Store. Since 2015, [Blockonomics](https://www.blockonomics.co/merchants?utm_source=wordpress-edd) has helped thousands of ecommerce sites increase sales by including Bitcoin as payment option for their customers. 
 
 ### Accept bitcoin payments, fast & easy ### 
 - Payments are received **directly into your wallet** 
