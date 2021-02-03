@@ -77,10 +77,6 @@
   margin:auto !important;
 }
 
-.bnomics-amount{
-  margin-top: 10px;
-}
-
 .bnomics-amount-input, .bnomics-address-input {
   padding: 2px 4px;
   font-weight: 600;
