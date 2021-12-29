@@ -659,6 +659,58 @@ class EDD_Blockonomics
 </script>
 ';
 
+    $advanced_settings = '<p id="advanced_title" class="bnomics-options-bold"><a href="javascript:show_advanced()">'.__('Advanced Settings', 'edd-blockonomics').'&#9660;</a></p>
+      <div id="advanced_window" style="display:none">
+        <p class="bnomics-options-bold"><a href="javascript:show_basic()">'.__('Advanced Settings', 'blockonomics-bitcoin-payments').' &#9650;</a></p>
+        <table class="form-table">
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+      <script>
+        let advanced_window = document.getElementById("advanced_window");
+        let advanced_title = document.getElementById("advanced_title");
+
+        function show_advanced() {
+          advanced_title.style.display = "none";
+          advanced_window.style.display = "block";
+        }
+        function show_basic() {
+          advanced_title.style.display = "block";
+          advanced_window.style.display = "none";
+        }
+
+        function getParentRow(ele) {
+          let parent_container = ele
+          do {
+            parent_container = parent_container.parentNode
+          } while(!parent_container.matches("tr") && parent_container !== document.body )
+          return parent_container
+        }
+
+        let advanced_settings = document.querySelectorAll(".edd-blockonomics-advanced");
+        let advanced_row_container = document.querySelector("#advanced_window .form-table tbody");
+        
+        // Move advanced settings to the new container
+        advanced_settings.forEach(setting => {
+          let parentRow = getParentRow(setting);
+          advanced_row_container.appendChild(parentRow);
+        });
+        
+        document.addEventListener("DOMContentLoaded", function(event) {
+          // Once DOM is initialized
+          
+          // Fix for UI
+  
+          // Add colspan to container for full width
+          advanced_window.parentElement.setAttribute("colspan", "2");
+          // Remove empty <td> to empty space
+          advanced_window.parentElement.parentElement.children[1].remove();
+       
+       });
+      </script>
+    ';
+
     $blockonomics_settings = array(
       array(
         'id'      => 'edd_blockonomics_api_key',
@@ -681,7 +733,8 @@ class EDD_Blockonomics
           '20' => '20',
           '25' => '25',
           '30' => '30'
-        )
+        ),
+        'field_class' => 'edd-blockonomics-advanced'
       ),
       array(
         'id'      => 'edd_blockonomics_confirmations',
@@ -691,7 +744,14 @@ class EDD_Blockonomics
           '2' => '2 (recommended)',
           '1' => '1',
           'zero' => '0'
-        )       
+        ),
+        'field_class' => 'edd-blockonomics-advanced'
+      ),
+      array(
+        'id'      => 'edd_blockonomics_advanced_settings',
+        'name'    => $advanced_settings,
+        'readonly' => true,
+        'type'    => 'advanced_settings',
       ),
       array(
         'id'      => 'edd_blockonomics_testsetup',
@@ -724,6 +784,11 @@ class EDD_Blockonomics
 
 /*Call back method for the setting 'testsetup'*/
 function edd_testsetup_callback()
+{
+  printf("");
+}
+
+function edd_advanced_settings_callback()
 {
   printf("");
 }
