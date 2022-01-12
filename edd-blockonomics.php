@@ -659,55 +659,32 @@ class EDD_Blockonomics
 </script>
 ';
 
-    $advanced_settings = '<p id="advanced_title" class="bnomics-options-bold"><a href="javascript:show_advanced()">'.__('Advanced Settings', 'edd-blockonomics').'&#9660;</a></p>
-      <div id="advanced_window" style="display:none">
-        <p class="bnomics-options-bold"><a href="javascript:show_basic()">'.__('Advanced Settings', 'blockonomics-bitcoin-payments').' &#9650;</a></p>
-        <table class="form-table">
-          <tbody>
-          </tbody>
-        </table>
-      </div>
+    $advanced_settings = '<p id="advanced_title_closed" class="bnomics-options-bold">
+        <a href="javascript:show_advanced()">'.__('Advanced Settings', 'edd-blockonomics').'&#9660;</a>
+      </p>
+      <p id="advanced_title_open" class="bnomics-options-bold">
+        <a href="javascript:show_basic()">'.__('Advanced Settings', 'blockonomics-bitcoin-payments').' &#9650;</a>
+      </p>
+      
       <script>
-        let advanced_window = document.getElementById("advanced_window");
-        let advanced_title = document.getElementById("advanced_title");
+        let advanced_title_closed = document.getElementById("advanced_title_closed");
+        let advanced_title_open = document.getElementById("advanced_title_open");
 
         function show_advanced() {
-          advanced_title.style.display = "none";
-          advanced_window.style.display = "block";
+          advanced_title_closed.style.display = "none";
+          advanced_title_open.style.display = "block";
+          document.querySelectorAll(".edd-blockonomics-advanced").forEach(ele => ele.style.display = "table-row");
         }
         function show_basic() {
-          advanced_title.style.display = "block";
-          advanced_window.style.display = "none";
+          advanced_title_closed.style.display = "block";
+          advanced_title_open.style.display = "none";
+          document.querySelectorAll(".edd-blockonomics-advanced").forEach(ele => ele.style.display = "none");
         }
 
-        function getParentRow(ele) {
-          let parent_container = ele
-          do {
-            parent_container = parent_container.parentNode
-          } while(!parent_container.matches("tr") && parent_container !== document.body )
-          return parent_container
-        }
-
-        let advanced_settings = document.querySelectorAll(".edd-blockonomics-advanced");
-        let advanced_row_container = document.querySelector("#advanced_window .form-table tbody");
-        
-        // Move advanced settings to the new container
-        advanced_settings.forEach(setting => {
-          let parentRow = getParentRow(setting);
-          advanced_row_container.appendChild(parentRow);
-        });
-        
         document.addEventListener("DOMContentLoaded", function(event) {
-          // Once DOM is initialized
-          
-          // Fix for UI
-  
-          // Add colspan to container for full width
-          advanced_window.parentElement.setAttribute("colspan", "2");
-          // Remove empty <td> to empty space
-          advanced_window.parentElement.parentElement.children[1].remove();
-       
-       });
+          show_basic();
+        });
+
       </script>
     ';
 
@@ -724,6 +701,12 @@ class EDD_Blockonomics
         'type'    => 'text'
       ),
       array(
+        'id'      => 'edd_blockonomics_advanced_settings',
+        'name'    => $advanced_settings,
+        'readonly' => true,
+        'type'    => 'advanced_settings',
+      ),
+      array(
         'id'      => 'edd_blockonomics_payment_countdown_time',
         'name'    => __('Time period of countdown timer on payment page (in minutes)', 'edd-blockonomics'),
         'type'    => 'select',
@@ -734,7 +717,7 @@ class EDD_Blockonomics
           '25' => '25',
           '30' => '30'
         ),
-        'field_class' => 'edd-blockonomics-advanced'
+        'class' => 'edd-blockonomics-advanced'
       ),
       array(
         'id'      => 'edd_blockonomics_confirmations',
@@ -745,13 +728,7 @@ class EDD_Blockonomics
           '1' => '1',
           'zero' => '0'
         ),
-        'field_class' => 'edd-blockonomics-advanced'
-      ),
-      array(
-        'id'      => 'edd_blockonomics_advanced_settings',
-        'name'    => $advanced_settings,
-        'readonly' => true,
-        'type'    => 'advanced_settings',
+        'class' => 'edd-blockonomics-advanced'
       ),
       array(
         'id'      => 'edd_blockonomics_testsetup',
