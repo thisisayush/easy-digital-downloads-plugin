@@ -422,7 +422,11 @@ class EDD_Blockonomics
     if ($address)
     {
       header("Content-Type: application/json");
-      exit(json_encode($orders[$address]));
+      $order = $orders[$address];
+      if (isset($order)) {
+        $order['time_remaining'] = $order['timestamp'] + edd_get_option("edd_blockonomics_payment_countdown_time", 10)*60 - time();
+      }
+      exit(json_encode($order));
     }
 
     try

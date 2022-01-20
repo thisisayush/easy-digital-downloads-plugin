@@ -85,7 +85,7 @@ app.controller('CheckoutController', function($scope, $interval, Order, $httpPar
             $scope.order.address = $scope.address;
             //Check the status of the order
             if ($scope.order.status == -1) {
-                $scope.clock = $scope.order.timestamp + totalTime - Math.floor(Date.now() / 1000);
+                $scope.clock = $scope.order.time_remaining;
                 //Mark order as expired if we ran out of time
                 if ($scope.clock < 0) {
                     $scope.order.status = -3;
