@@ -596,6 +596,35 @@ class EDD_Blockonomics
 </script>
 ';
 
+    $advanced_settings = '<p id="advanced_title_closed" class="bnomics-options-bold">
+        <a href="javascript:show_advanced()">'.__('Advanced Settings', 'edd-blockonomics').'&#9660;</a>
+      </p>
+      <p id="advanced_title_open" class="bnomics-options-bold">
+        <a href="javascript:show_basic()">'.__('Advanced Settings', 'blockonomics-bitcoin-payments').' &#9650;</a>
+      </p>
+      
+      <script>
+        let advanced_title_closed = document.getElementById("advanced_title_closed");
+        let advanced_title_open = document.getElementById("advanced_title_open");
+
+        function show_advanced() {
+          advanced_title_closed.style.display = "none";
+          advanced_title_open.style.display = "block";
+          document.querySelectorAll(".edd-blockonomics-advanced").forEach(ele => ele.style.display = "table-row");
+        }
+        function show_basic() {
+          advanced_title_closed.style.display = "block";
+          advanced_title_open.style.display = "none";
+          document.querySelectorAll(".edd-blockonomics-advanced").forEach(ele => ele.style.display = "none");
+        }
+
+        document.addEventListener("DOMContentLoaded", function(event) {
+          show_basic();
+        });
+
+      </script>
+    ';
+
     $blockonomics_settings = array(
       array(
         'id'      => 'edd_blockonomics_api_key',
@@ -609,6 +638,12 @@ class EDD_Blockonomics
         'type'    => 'text'
       ),
       array(
+        'id'      => 'edd_blockonomics_advanced_settings',
+        'name'    => $advanced_settings,
+        'readonly' => true,
+        'type'    => 'advanced_settings',
+      ),
+      array(
         'id'      => 'edd_blockonomics_payment_countdown_time',
         'name'    => __('Time period of countdown timer on payment page (in minutes)', 'edd-blockonomics'),
         'type'    => 'select',
@@ -618,7 +653,8 @@ class EDD_Blockonomics
           '20' => '20',
           '25' => '25',
           '30' => '30'
-        )
+        ),
+        'class' => 'edd-blockonomics-advanced'
       ),
       array(
         'id'      => 'edd_blockonomics_confirmations',
@@ -628,7 +664,8 @@ class EDD_Blockonomics
           '2' => '2 (recommended)',
           '1' => '1',
           'zero' => '0'
-        )       
+        ),
+        'class' => 'edd-blockonomics-advanced'
       ),
       array(
         'id'      => 'edd_blockonomics_testsetup',
@@ -661,6 +698,11 @@ class EDD_Blockonomics
 
 /*Call back method for the setting 'testsetup'*/
 function edd_testsetup_callback()
+{
+  printf("");
+}
+
+function edd_advanced_settings_callback()
 {
   printf("");
 }
