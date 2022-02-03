@@ -103,6 +103,10 @@ app.controller('CheckoutController', function($scope, $interval, Order, $httpPar
                     }, 2000, 1);
                 }
             }
+            else if ($scope.order.status >= 0){
+                //Goto order confirmation as payment is already in process or done
+                window.location = $scope.finish_order_url();
+            }
         });
     }
 
