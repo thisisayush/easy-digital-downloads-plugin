@@ -12,7 +12,10 @@
       </div>
       <!-- Payment Expired -->
       <div class="bnomics-order-expired-wrapper" ng-show="order.status == -3" ng-cloak>
-        <h3 class="warning bnomics-status-warning"><?=__('Payment Expired (Use the browser back button and try again)', 'edd-blockonomics')?></h3><br>
+	<h3 class="warning bnomics-status-warning"><?=__('Payment Expired (Use the browser back button and try again)', 'edd-blockonomics')?></h3><br>
+      </div>
+      <div class="bnomics-order-expired-wrapper" ng-show="order.status == -2" ng-cloak>
+       <h3 class="warning bnomics-status-warning"><?=__('Paid order BTC amount is less than expected. Contact merchant', 'edd-blockonomics')?></h3><br>
       </div>
       <!-- Amount row -->
       <div class="bnomics-order-panel" ng-show="order.status == -1" ng-cloak>
@@ -37,7 +40,6 @@
               <div class="bnomics-bg">
                 <!-- Order Status -->
                 <div class="bnomics-amount">
-                    <span class="warning bnomics-status-warning" ng-show="order.status == -2" ng-cloak><?=__('Payment Error', 'edd-blockonomics')?></span>
                     <div class="bnomics-amount-text" ng-hide="amount_copyshow" ng-cloak><?=__('To pay, send exactly this BTC amount', 'edd-blockonomics')?></div>
                     <div class="bnomics-copy-amount-text" ng-show="amount_copyshow" ng-cloak><?=__('Copied to clipboard', 'edd-blockonomics')?></div>
                     <ul ng-click="blockonomics_amount_click()" id="bnomics-amount-input" class="bnomics-amount-input">
