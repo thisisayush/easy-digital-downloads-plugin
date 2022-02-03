@@ -359,7 +359,25 @@ class EDD_Blockonomics
     if ($address)
     {
       header("Content-Type: application/json");
-      exit(json_encode($orders[$address]));
+
+      $order = $orders[$address];
+      $blockonomics = new BlockonomicsAPI;
+
+      if($order['status'] == -1) {
+        // Update Order Params untill payment is initiated.
+        
+        if($order['currency'] != 'BTC'){
+          $price = $blockonomics->get_price($order['currency']);
+        } else{
+          $price = 1;
+        }
+
+        $order['satoshi'] = intval(1.0e8*$order['value']/$price);
+        $orders[$address] = $order;
+        edd_update_option('edd_blockonomics_orders', $orders);
+      }
+
+      exit(json_encode($order));
     }
 
     try

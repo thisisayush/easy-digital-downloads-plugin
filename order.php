@@ -12,7 +12,7 @@
       </div>
       <!-- Payment Expired -->
       <div class="bnomics-order-expired-wrapper" ng-show="order.status == -3" ng-cloak>
-	<h3 class="warning bnomics-status-warning"><?=__('Payment Expired (Use the browser back button and try again)', 'edd-blockonomics')?></h3><br>
+      <h3 class="warning bnomics-status-warning"><?=__('Payment Expired (Please refresh the page to try again)', 'edd-blockonomics')?></h3><br>
       </div>
       <div class="bnomics-order-expired-wrapper" ng-show="order.status == -2" ng-cloak>
        <h3 class="warning bnomics-status-warning"><?=__('Paid order BTC amount is less than expected. Contact merchant', 'edd-blockonomics')?></h3><br>
