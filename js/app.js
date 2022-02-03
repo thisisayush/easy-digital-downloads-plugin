@@ -85,7 +85,7 @@ app.controller('CheckoutController', function($scope, $interval, Order, $httpPar
             $scope.order.address = $scope.address;
             //Check the status of the order
             if ($scope.order.status == -1) {
-                $scope.clock = $scope.order.timestamp + totalTime - Math.floor(Date.now() / 1000);
+                $scope.clock = totalTime;
                 //Mark order as expired if we ran out of time
                 if ($scope.clock < 0) {
                     $scope.order.status = -3;
@@ -93,7 +93,7 @@ app.controller('CheckoutController', function($scope, $interval, Order, $httpPar
                 }
                 $scope.tick_interval = $interval($scope.tick, 1000);
                 //Connect and Listen on websocket for payment notification
-                var ws = new ReconnectingWebSocket("wss://www.blockonomics.co/payment/" + $scope.order.address + "?timestamp=" + $scope.order.timestamp);
+                var ws = new ReconnectingWebSocket("wss://www.blockonomics.co/payment/" + $scope.order.address);
                 ws.onmessage = function(evt) {
                     ws.close();
                     $interval(function() {
