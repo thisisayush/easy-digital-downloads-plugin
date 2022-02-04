@@ -1,5 +1,8 @@
 == Changelog ==
 
+= 1.3.7  =
+* Improved test setup and checkout experience
+
 = 1.3.6  =
 * Fixed callback issues due to sanitize_key
 
